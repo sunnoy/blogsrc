@@ -1,0 +1,16 @@
+language: node_js
+node_js: stable
+script:
+  - npm install
+  - cd themes/next
+  - npm install
+  - cd ../../
+  - hexo generate
+  - echo "www.li-rui.top" > public/CNAME
+  - git config user.name "sunnoy"
+  - git config user.email "ttzhsz@163.com"
+  - cd public
+  - git init
+  - git add .
+  - git commit -m "travis auto at `date +"%Y-%m-%d %H:%M"`"
+  - git push --force --quiet "https://${CI}@github.com/sunnoy/sunnoy.github.io.git" master:master
