@@ -1,0 +1,293 @@
+---
+title: iptables使用
+date: 2018-11-04 12:12:28
+tags:
+- iptables
+---
+### iptables使用
+
+
+![TIM截图20180516090811](https://qiniu.li-rui.top/TIM%E6%88%AA%E5%9B%BE20180516090811.png)
+
+- 该脚本自适应centos6/7
+- 在centos7中会停用firewall
+
+```
+wget http://git.centos8.com/lirui/nor_service/raw/master/iptables/iptables.sh && chmod +x  iptables.sh && ./iptables.sh
+```
+<!--more-->
+
+### 1. iptables使用
+
+- 安装
+
+
+```bash
+yum install iptables-services -y
+```
+
+- 服务
+
+```bash
+#centos6
+chkconfig iptables off   
+#centos7
+systemctl disables iptables
+```
+
+### 1.1 端口放行
+
+
+```bash
+iptables -I INPUT  -m tcp -p tcp --dport 80 -j ACCEPT
+iptables -I INPUT  -m tcp -p tcp --dport 60301:60400${ssr_port} -j ACCEPT
+iptables -A INPUT  -j DROP
+
+#查看规则序号
+iptables -nvL --line-number
+#插入规则到第三行
+iptables -I INPUT 3 -s 192.168.1.3 -j DROP
+#修改动作对第三行
+iptables -R INPUT 3 -j ACCEPT
+ 
+
+
+
+```
+### 1.2 FTP端口转发
+
+
+查看端口转发**cat /proc/sys/net/ipv4/ip_forward**
+
+```bash
+
+#ftp端口转发
+
+#IPA为前端负载均衡内网IP
+#PORTA为前端负载均衡的转发端口
+#PORTAA为后端ftp服务器的数据通讯端口范围10000:20000
+IPA=
+PORTA=
+PORTAA=
+
+#IPB为后端ftp的内网IP
+#PORTB为后端ftp的通讯端口
+IPB=
+PORTB=
+ 
+iptables -t nat -I POSTROUTING -d $IPB -j SNAT --to-source $IPA
+iptables -t nat -I PREROUTING -p tcp -m multiport --dports $PORTAA -j DNAT --to-destination $IPB
+iptables -t nat -I PREROUTING -p tcp -m tcp --dport $PORTA -j DNAT --to-destination $IPB:$PORTB
+
+```
+
+- 端口转发脚本
+
+服务器A有内网ipA，外网ipAA
+服务器B有内网ipB，无外网
+服务器A上做POSTROUTING链上源地址要使用内网ipA，如果使用外网ipAA，服务器B网关不是服务器A有内网ipA的情况下，包就会回不到服务器A上来
+服务器A上不用添加INPUT链
+
+
+```bash
+#ipA is intern ip
+#ipA:portA -> ipB:portB
+
+ipA=192.168.1.3
+portA=30022
+ipB=192.168.1.5
+portB=22
+
+#open forward
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+sysctl -p
+
+
+iptables -t nat -I PREROUTING -p tcp -m tcp --dport $portA -j DNAT --to-destination $ipB:$portB
+iptables -t nat -I POSTROUTING -p tcp -m tcp --dport $portB -j SNAT --to-source $ipA
+iptables –I FORWARD –j ACCEPT
+
+
+service iptables save
+
+
+
+#多端口时
+#iptables -t nat -A POSTROUTING -j MASQUERADE
+
+```
+
+- windows远程桌面
+
+```bash
+iptables -t nat -I PREROUTING -p tcp -m tcp --dport 3389 -j DNAT --to-destination 10.100.0.236:3389
+
+iptables -t nat -I POSTROUTING -d 10.100.0.236 -p tcp -m tcp --dport 3389 -j SNAT --to-source 10.220.129.212
+
+```
+
+- 数据库端口转发
+
+```bash
+iptables -t nat -A PREROUTING -p tcp -m tcp --dport 3389 -j DNAT --to-destination 10.100.0.236:3389
+iptables -t nat -A POSTROUTING -d 10.100.0.236 -p tcp -m tcp --dport 3389 -j SNAT --to-source 10.220.129.212
+```
+
+- IP分享器
+
+**使用双重转发也是可以的**
+
+```bash
+#分享器
+#外网网卡eth0，IP为公网IP：122.114.196.212。内网网卡eth2，IP为：10.220.129.212
+
+#内网主机，IP为10.220.129.44-45.网关设置为10.220.129.212
+
+#限制内网主机上网
+iptables -t nat -I POSTROUTING -s 10.220.129.44 -j SNAT --to-source 122.114.196.212
+
+#内网主机都可以
+iptables -t nat -A POSTROUTING -j SNAT --to-source 122.114.196.212
+
+#特殊的snat，最简单命令，不推荐，效率没有SNAT高，适用于宽带场景
+iptables -t nat -A POSTROUTING -j MASQUERADE
+
+```
+
+>内网的机器是如何通过nat访问公网的？
+>内网机器去访问114.114.114.114，它的数据包为(s:10.220.129.44,d:114.114.114.114)
+>数据包到达内网机器的OUTPUT链后，依据内网机器路由表除了默认路由到114.114.114.114的匹配，于是就把数据包交给默认网关10.220.129.212（也就是nat服务器）
+>nat服务器收到该数据包后，经过PREROUTING链然后进行路由判断，发现本机路由表也没有，于是交给nat服务器默认网关122.114.196.129，并通过eth0发出，然后进入FORWARD链，接着进入POSTROUTING链。
+>到了POSTROUTING因为匹配到了设定规则数据包就会改为(s:122.114.196.212,d:114.114.114.114)，在此会对这个转发进行追踪，依据ip_conntrack模块。进而有eth0发出到下一跳，最终到达114.114.114.114
+
+>数据包(s:114.114.114.114,d:122.114.196.212)到达nat服务器，在PREROUTING链之前就会检查ip_conntrack模块，查到记录后直DNAT接转数据包(s:114.114.114.114,d:10.220.129.44)
+
+**可见SNAT不同于DNAT，只需要设定一条SNAT规则。不管是DNAT还是SNAT都会发生DNAT和SNAT。区别在于数据包的前半程干啥**
+
+
+
+### 2. 仅仅允许某一个
+
+```bash
+iptables -I INPUT -i eth0 -s 110.112.0.171 -j ACCEPT
+iptables -I INPUT -i eth1 -p tcp -j ACCEPT
+iptables -A INPUT -i eth0 -j DROP
+#执行顺序
+1 iptables -I INPUT -i eth0 -j DROP
+2 iptables -I INPUT -i eth0 -s 116.255.132.7 -j ACCEPT
+3 iptables -I INPUT -i eth0 -s 116.255.132.12 -j ACCEPT
+4 iptables -I INPUT -i eth1 -j ACCEPT
+
+```
+
+### 3. windows
+
+```bash
+#XP/2003需要先安裝IPV6,Win7以上系统自带.
+netsh interface ipv6 install
+
+#查看端口转发
+netsh interface portproxy show all
+
+#查看ipv4 to ipv4转发
+netsh interface portproxy show v4tov4
+
+#将本地的8080端口的数据转发至192.168.8.108上的8080端口
+netsh interface portproxy add v4tov4 listenport=8080 connectaddress=192.168.8.108 connectport=8080
+
+#将192.168.193.1上的22映射到192.168.191.2的22端口
+netsh interface portproxy add v4tov4 listenaddress=192.168.193.1 listenport=22 connectaddress=192.168.191.2 connectport=22
+
+#删除映射
+netsh interface portproxy del v4tov4 listenport=22 listenaddress=192.168.193.1
+
+```
+
+#### web示例
+
+```bash
+-A INPUT -i eth1 -j ACCEPT
+-A INPUT -i eth0 -p tcp -m state --state NEW -m tcp --dport 6431 -j ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+-A INPUT -i eth0 -j DROP
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+
+#备份
+#cat /etc/sysconfig/iptables
+# Generated by iptables-save v1.4.7 on Fri Jun  8 15:08:07 2018
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [1050:102193]
+-A INPUT -i eth1 -j ACCEPT
+-A INPUT -i eth0 -p tcp -m tcp --dport 6215 -j ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -i eth0 -j DROP
+COMMIT
+# Completed on Fri Jun  8 15:08:07 2018
+
+```
+
+#### 防止DDOS/CC攻击
+
+使用模块connlimit和limit
+
+- connlimit
+
+限制每个IP或者IP段的并发连接数
+
+```bash
+#小于或者等于n个存在的链接数就会匹配
+--connlimit-upto n
+#大于存在的连接数n就会匹配
+--connlimit-above n
+
+#示例
+#限制每个IP最多100个链接数
+iptables -I INPUT -p tcp --syn --dport 80 -m connlimit --connlimit-above 100 -j REJECT
+
+```
+
+- limit
+
+限制链接速率
+
+```bash
+#限制最大速率，每天/分钟/秒过去几个封包--limit 3/s
+--limit rate[/second|/minute|/hour|/day]
+
+#初始的最大通过封包数量，--limit-burst 6
+#初始允许通过6个，然后假设没有封包进来，由于limit限制，两秒后就是六个，以后不在增加
+--limit-burst number
+
+```
+
+- 防攻击
+
+```bash
+#新建syn链
+#初始10个封包，每秒50个封包进入
+#单个IP最大连接数为20
+iptables -N syn-flood
+iptables -A syn-flood -m limit --limit 50/s --limit-burst 10 -j REJECT
+iptables -A syn-flood -m connlimit  --connlimit-above 20 -j REJECT 
+iptables -A syn-flood -j DROP
+iptables -I INPUT -i eth0 -p tcp -m tcp -m multiport --dports 80,443 -j syn-flood
+````
+
+
+#### tcp状态
+
+如果不加第一条，在主机内访问端口80，远程主机过来的包就会被阻挡在外面。
+过程分析：本地访问远程80的时候会以随机端口访问远程主机80，远程主机则会通过80端口向本机的之前的随机端口回包，此时这个连接的状态就是ESTABLISHED/RELATED
+
+这样就可以通追踪连接状态来放行回包。
+
+```bash
+iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -I INPUT -i eth0 -p tcp -m tcp --dport 22 -j ACCEPT
+iptables -A INPUT -i eth0 -j DROP
+```

@@ -1,0 +1,235 @@
+---
+title: linux策略路由
+date: 2018-11-04 12:12:28
+tags:
+- Linux
+---
+### 1. linux策略路由
+
+- 传统路由
+
+匹配方式为数据包的**目的地址**和本机路由表进行匹配
+
+不足：无法根据特定协议指定数据包的出口网卡
+
+- 策略路由
+
+Linux最多可以同时存在(0-255)256张路由表，每一个路由表对应一个匹配规则，数据包根据RPDB(路由策略数据库)内的策略来进入对应的路由表。
+
+<!--more--> 
+
+- 默认表
+
+**local**表255本地路由表，本地接口地址，广播地址，nat地址都放在这个表，系统自动维护
+
+**main**表254主路由表，`route`命令添加的路由都会在这个表内
+
+**default**表253默认路由表，一般默认路由在这里
+
+**保留表**表0
+
+### 2. 操作路由表
+
+- 显示路由表
+
+```bash
+[root@master ~]# ip rule show
+#冒号之前的数字表示该路由表的被匹配的优先顺序
+#数字越小最先匹配，优先级范围0~4亿多，默认0/32766/32767已经被占用，添加路由时没有指定优先级就会从32766开始递减
+##
+#from表示与路由表匹配的规则，还有其他关键字，to/tos/fwmark等
+##
+#loca/main/default为路由表的名称
+0:      from all lookup local
+32766:  from all lookup main
+32767:  from all lookup default
+
+```
+
+- 显示某一个详细路由表
+
+```bash
+ip route show table main
+```
+
+
+- 创建路由表
+
+可以根据不同的选择器来创建路由表
+
+```bash
+
+#设定优先级
+ip rule add from 192.168.1.10 table 10  prio 10
+
+20:     from all to 192.165.32.3 lookup 33
+
+
+#source ip，可以为来源IP，也可以为网段
+ip rule add from 192.168.1.10 table 10
+ip rule add from 192.168.2.0/24 table 20
+
+#destination IP，可以为目的地的IP或者网段
+ip rule add to 168.95.1.1 table 10
+ip rule add to 168.96.0.0/24 table 20
+
+#fwmark，需要和IPtables结合使用
+#设定mark值
+iptables -t mangle -A FORWARD -i eth3 -p tcp --dport 80 -j MARK --set-mark 1
+iptables -t mangle -A FORWARD -i eth3 -p tcp --dport 25 -j MARK --set-mark 2
+iptables -t mangle -A FORWARD -i eth3 -j MARK --set-mark 3
+#fwmark根据mark值来判断数据包走哪个路由表
+ip rule add fwmark 1 table 1
+ip rule add fwmark 2 table 2
+ip rule add fwmark 3 table 3
+
+#根据dev
+ip rule add dev eth2 table 1
+ip rule add dev eth3 table 3
+
+
+
+```
+
+- 路由表更改名称
+
+通过在文件`/etc/iproute2/rt_tables`添加映射
+
+```bash
+路由表id    映射名称
+33          dong
+```
+
+- 删除路由表
+
+使用`ip rule del ######`来删除
+
+### 3. 路由表添加路由
+
+为表**100**来添加路由
+
+>add 增加路由
+>
+>del 删除路由
+>
+>-net 设置到某个网段的路由
+>
+>-host 设置到某台主机的路由
+>
+>gw 出口网关 IP地址
+>
+>dev 出口网关 物理设备名
+
+- 完整步骤
+
+
+```bash
+#1创建规则与相应路由表
+
+#凡是来源为192.168.2.网段的IP匹配
+ip rule add from 192.168.2.0/24 table 10
+
+#2在路由表内添加路由
+
+#2.1本机与网段192.168.2.的通信都走eth1
+ip route add 192.168.1.0/24 dev eth1 table 10
+
+
+#2.2在路由表内添加默认路由
+ip route add default via 192.168.1.254 table 10
+ip route add default via 195.96.98.253 dev ppp2 table John
+
+#3刷新路由缓存
+
+ip route flush cache
+
+
+```
+
+### 4. 路由表内删除路由
+
+删除表内路由需要**指定表**
+
+```bash
+#删除默认路由
+ip route del default table 10
+
+#删除其他路由
+ip route del 192.168.1.0/24 table 10
+```
+
+### 5. 双线策略路由
+
+- 分别创建路由表
+
+```bash
+#创建电信路由表
+ip rule add from 电信IP table 100
+#创建联通路由表
+ip rule add from 联通IP table 200
+```
+
+
+- 路由表内添加路由
+
+```bash
+/bin/ip route add default via 电信网关 dev 电信网卡设备名称 src 电信IP table 100 prio 50
+
+/bin/ip route add default via 联通网关 dev 联通网卡设备名称 src  联通IP table 200 prio 50
+```
+
+### 5. 静态路由添加
+
+```bash
+#route命令
+route add -net 192.168.0.0/24 gw 192.168.0.1
+route add -host 192.168.1.1 dev 192.168.0.1
+route add default gw 192.168.0.1
+
+route -n
+
+#ip命令
+ip route add 192.168.0.0/24 via 192.168.0.1
+ip route add 192.168.1.1 dev 192.168.0.1
+ip route add default via 192.168.0.1 dev eth0
+
+ip route
+
+```
+
+#### 6. 永久路由
+
+对某个接口添加路由
+
+/etc/sysconfig/network-scripts/route-eth1 
+
+```bash
+echo "172.16.0.0/16 via 172.16.2.254" > /etc/sysconfig/network-scripts/route-eth1
+
+service network restart
+```
+
+## windows路由
+
+```cmd
+#-p为永久保存
+#添加
+#route add 目标网络 mask 子网掩码 网关 [接口]（可省略）
+route -p add 134.105.0.0 mask 255.255.0.0 134.105.64.1 
+#删除
+#route delete +网络目标+网关 
+route -p delete 134.105.0.0 mask 255.255.0.0 134.105.64.1
+#打印
+route print -4
+#添加默认
+
+```
+### ip 添加
+
+```bash
+ip addr add 192.168.2.18/24 dev br-wan
+ip route add default via 192.168.2.1 dev br-wan
+
+ip addr del 192.168.2.18/24 dev br-wan
+ip route del default via 192.168.2.1 dev br-wan
+```
