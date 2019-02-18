@@ -35,7 +35,7 @@ mon数量推荐为奇数，而且增加也是两个一组进行增加。当mon�
 
 第一台mon->第二台mon->第一台mgr->第一台osd
 
-当然上面可以一次执行完全装完。在线测试
+当然上面可以一次执行完全装完。
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTY3OTY2MjY2MF19
+eyJoaXN0b3J5IjpbLTI5ODYzMjIxOSwxNjc5NjYyNjYwXX0=
 -->
