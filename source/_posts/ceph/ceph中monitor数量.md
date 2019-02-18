@@ -5,7 +5,7 @@ tags:
 - ceph
 ---
 
-# monitor作用测试缓存时间
+# monitor作用
 
 ceph中mon作用主要是保存ceph集群中的各种图，ceph客户端和集群交互的第一步是先和mon交互。因此mon就很重要。ceph原生支持mon高可用，通过使用Paxos算法来进行主备切换。
 
