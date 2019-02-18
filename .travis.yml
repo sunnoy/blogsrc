@@ -3,7 +3,7 @@ node_js: stable
 cache: 
   directories:
     - node_modules
-    - public
+    - public/.git
 script:
   - export TZ='Asia/Shanghai'
   #- npm install
