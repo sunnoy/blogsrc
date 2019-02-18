@@ -1,5 +1,6 @@
 ---
 title: kubernetes集群内服务暴露方式
+date: 2018-12-14 12:12:28
 tags:
 - kubernetes
 ---

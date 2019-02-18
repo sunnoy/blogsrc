@@ -1,5 +1,6 @@
 ---
 title: proc目录介绍
+date: 2019-12-17 12:12:28
 tags:
 - Linux
 ---

@@ -10,13 +10,11 @@ comments: false
 
 那么一篇博文如何与您见面的呢？
 
-本地使用vscode写markdown文档，文档中的图片托管到七牛云。完成文档后使用git上传到内网gitlab。
+本地使用vscode写markdown文档，文档中的图片托管到七牛云。完成文档后使用git上传到GitHub [博客源码仓库](https://github.com/sunnoy/blogsrc)。
 
-上传完成后push操作会触发gitlab的webhook去向内网测试用服务器发送post请求。
+上传完成后push操作会触发[travis-ci](https://travis-ci.org)自动构建，将渲染好的静态页面push到[GitHub pages](https://github.com/sunnoy/sunnoy.github.io)
 
-内网测试服务器上由flask写的web服务收到webhook请求后就会执行一个脚本，脚本内容主要是拉取最新文档，然后生成hexo的静态页面，主题使用next主题。
-
-页面生成完成后会同时将静态页面部署到快云的虚拟主机和GitHub的gitpages，通过阿里云dns的线路选择，境外访问会到gitpages，境内访问会到快云虚拟主机。
+博客工具使用的[HEXO](https://hexo.io/)，主题为[next](https://github.com/iissnan/hexo-theme-next)
 
 ## 关于作者
 

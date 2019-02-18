@@ -1,5 +1,6 @@
 ---
 title: jenkins和docker自动编译maven项目
+date: 2019-01-14 12:12:28
 tags:
 - jenkins
 ---

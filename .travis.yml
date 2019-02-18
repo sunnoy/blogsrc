@@ -1,6 +1,7 @@
 language: node_js
 node_js: stable
 script:
+  - export TZ='Asia/Shanghai'
   - npm install
   - cd themes/next
   - npm install

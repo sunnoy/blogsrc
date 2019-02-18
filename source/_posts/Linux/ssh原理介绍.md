@@ -1,5 +1,6 @@
 ---
 title: ssh原理介绍
+date: 2018-12-04 12:12:28
 tags:
 - linux
 ---

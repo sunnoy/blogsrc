@@ -91,12 +91,12 @@ footer:
   # Beian icp information for Chinese users. In China, every legal website should have a beian icp in website footer.
   # http://www.miitbeian.gov.cn
   beian:
-    enable: true
+    enable: false
     icp: 豫ICP备18021316号-2
 
   # -------------------------------------------------------------
   # Any custom text can be defined here.
-  custom_text: 本站由 <a target="_blank" rel="external nofollow" href="https://www.kuaiyun.cn/"><b>快云</b></a> 强力驱动
+  custom_text: 
 
 # Creative Commons 4.0 International License.
 # https://creativecommons.org/share-your-work/licensing-types-examples
