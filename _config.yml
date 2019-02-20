@@ -6,7 +6,7 @@
 title: 李睿的博客
 subtitle: 感受技术之美
 description: 关注DEVOPS、Microservice
-author: Sunnoy
+author: 李睿
 language: zh-CN
 timezone:
 
@@ -81,13 +81,3 @@ search:
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  - type: ftpsync
-    host: vhost171.cloudvhost.top
-    user: webmaster@HA516679
-    pass: QWZbO3VtiITixiLd
-    remote: /WEB/
-
-  - type: git
-    repo: git@github.com:sunnoy/sunnoy.github.io.git
-    branch: master
-    message: '站点更新:{{now("YYYY-MM-DD HH:mm:ss")}}'
