@@ -311,13 +311,13 @@ git status
 然后打开文件，解决冲突，删除一个分支的内容
 
 ```bash
-<<<<<<< HEAD
-<div id="footer">contact : email.support@github.com</div>
+#<<<<<<< HEAD
+#<div id="footer">contact : email.support@github.com</div>
 =======
 <div id="footer">
   please contact us at support@github.com
 </div>
->>>>>>> iss53
+#>>>>>>> iss53
 ```
 
 整理成为下面解决
@@ -386,6 +386,16 @@ git config  user.email "lirui@zzidc.net"
 #查看配置
 git config --list
 ```
+
+- git 配置文件存在两个
+
+一个是某个仓库的配置文件，一个是全局的配置文件
+
+仓库的配文件在 仓库目录 .git/config 文件
+
+全局的在 windows 中 /c/Users/lirui/.gitconfig 文件
+Linux中 /etc/gitconfig 文件
+
 
 ### 5. 建立仓库
 
