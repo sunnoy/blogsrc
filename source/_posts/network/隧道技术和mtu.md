@@ -119,19 +119,25 @@ Bit 2: MF（More Fragment），表示是否该报文为最后一片，0表示最
 
 ### Path MTU Discovery
 
-如果发送主机在一个包内设置了不允许IP分片，即DF为1，那么当这个包到达一个mtu比较小的设备时就会直接丢弃，并发送一个icmp信息type=3，code=4，并附上该设备的mtu值到发送端，发送端看到后再去调整发送数据包的大小。如果设置了DF位但是没有收到任何回应，应该是icmp回应消息被防火墙拦截了。
+如果发送主机在一个包内设置了不允许IP分片，即DF为1，那么当这个包到达一个mtu比较小的设备时就会直接丢弃，并发送一个icmp信息，对ipv4是：Fragmentation Needed (Type 3, Code 4) ，对ipv6是：Packet Too Big (Type 2)，并附上该设备的mtu值到发送端，发送端看到后再去调整发送数据包的大小。如果设置了DF位但是没有收到任何回应，应该是icmp回应消息被防火墙拦截了。
 
 # 各种隧道中的头部
 
 ## vxlan
 
+VxLAN 的 overhead 是1514- 1464 = 50 byte。
+
 ![vxlna](https://qiniu.li-rui.top/vxlna.png)
 
 ## gre
 
+GRE 的 overhead 是 1514 - 1490 = 24 byte
+
 ![gre](https://qiniu.li-rui.top/gre.png)
 
 ## geneve
+
+geneve 的 overhead 是 1514 - 1490 = 50 byte
 
 ![geneve](https://qiniu.li-rui.top/geneve.png)
 
