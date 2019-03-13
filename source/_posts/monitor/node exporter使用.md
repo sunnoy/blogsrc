@@ -55,6 +55,8 @@ docker run -d \
 
 ##　使用实例
 
+### 二进制启动
+
 ```bash
 ./node_exporter \
 --collector.systemd \
@@ -67,6 +69,35 @@ docker run -d \
 --collector.filesystem.ignored-mount-points="^/(dev|proc|sys|var/lib/docker/.+)($|/)" \
 --collector.systemd.unit-whitelist="^ceph.*$"
 
+```
+
+### docker-compose启动
+
+```yaml
+version: '3.1'
+services:
+
+  node-exporter:
+    image: prom/node-exporter:v0.17.0
+    volumes:
+      - /:/rootfs:ro
+      - /data/textfile_collector:/usr
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+    pid: "host"
+    command: 
+      - --path.rootfs=/host
+      - --collector.systemd
+      - --collector.mountstats
+      - --collector.processes
+      - --collector.interrupts
+      - --collector.textfile.directory=/usr
+      - --collector.filesystem.ignored-fs-types=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
+      - --collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\\d+n\\d+p)\\d+$$
+      - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+)($$|/)
+      - --collector.systemd.unit-whitelist=^ceph.*$$
+    ports:
+      - 9100:9100
+    restart: always
 ```
 
 ## Linux中统计
