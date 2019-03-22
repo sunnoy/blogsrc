@@ -4,9 +4,8 @@ date: 2018-11-04 12:12:28
 tags:
 - kubernetes
 ---
-## kubernetes-pv
 
-### 持久化存储
+# 持久化存储
 
 是个对象，支持的后端有多个
 
@@ -39,11 +38,13 @@ pv1       1Gi        RWO            Recycle          Bound     default/pvc2-nfs 
 
 ```
 
-#### capacity
+# 相关字段配置
+
+## capacity
 
 描述该pv属性，暂时支持存储空间
 
-#### accessModes
+## accessModes
 
 访问模式主要描述pv是否可以多个node读数据和写数据，分为
 
@@ -51,7 +52,7 @@ pv1       1Gi        RWO            Recycle          Bound     default/pvc2-nfs 
 **ReadOnlyMany(ROX)**：多节点读
 **ReadWriteMany(RWX)**：多节点读写
 
-#### persistentVolumeReclaimPolicy
+## persistentVolumeReclaimPolicy
 
 当pod不需要pv的时候，里面的资源怎么办，三个策略
 
@@ -59,7 +60,7 @@ pv1       1Gi        RWO            Recycle          Bound     default/pvc2-nfs 
 **Recycle**：资源回收，清除 PV 中的数据，效果相当于执行 rm -rf /pv/*
 **Delete**：删除，直接删除pv
 
-### 状态
+# 状态
 
 pv是有生命周期的，也就出现了pv的状态流转
 
@@ -68,7 +69,7 @@ pv是有生命周期的，也就出现了pv的状态流转
 **Released**：PVC 被删除，但是资源还未被集群重新声明
 **Failed**： 表示该 PV 的自动回收失败
 
-## pvc
+# pvc
 
 也是一个对象
 
@@ -97,7 +98,7 @@ pvc2-nfs   Bound     pv1       1Gi        RWO                           6s
 
 建立pvc的时候，系统会自动寻找可用的pv去和pvc去绑定，pvc的空间要小于pv的空间大小。
 
-## 使用pvc
+# 使用pvc
 
 利用nginx来使用
 

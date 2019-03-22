@@ -89,6 +89,11 @@ cat /etc/exports
 for i in {1..5}; do
 mkdir nfs${i}
 done
+
+#为每个pv简历文件夹
+for i in {1..5}; do
+rm -rf nfs${i}/*
+done
 ```
 
 

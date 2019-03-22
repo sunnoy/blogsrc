@@ -4,182 +4,143 @@ date: 2018-11-04 12:12:28
 tags:
 - kubernetes
 ---
-## kubernetes-ingress路由
 
-ingress用来管理进入集群中service中的流量到达正确的pod
+# ingress介绍
 
--   Nginx 反向代理负载均衡器
--   Ingress Controller
-    
-    Ingress Controller 可以理解为控制器，它通过不断的跟 Kubernetes API 交互，实时获取后端 Service、Pod 等的变化，比如新增、删除等，然后结合 Ingress 定义的规则生成配置，然后动态更新上边的 Nginx 负载均衡器，并刷新使配置生效，来达到服务自动发现的作用。
-    
--   Ingress
-    
-    Ingress 则是定义规则，通过它定义某个域名的请求过来之后转发到集群中指定的 Service。它可以通过 Yaml 文件定义，可以给一个或多个 Service 定义一个或多个 Ingress 规则。
-    
+ingress可以理解为nginx反向代理集群中的服务。ingress反向代理集群中的服务有多中方式，这里使用nodePort方式，外部客户端通过nodeport方式去向ingress发送http请求，该http请求中携带请求头主机信息。ingress接收到请求信息后通过内置的规则去找相应的集群service
+
+![ingress暴露服务以及高可用](https://qiniu.li-rui.top/ingress暴露服务以及高可用.jpg)
+
 <!--more-->
-### 1. 创建应用
-- 定义yaml文件
-yaml文件中`---`表示为另外一个yaml文件，也就是说两个yaml文件的内容可以卸载一起，部署的时候就会认为是部署两个yaml文件
-```yaml
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: webapp1
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: webapp1
-    spec:
-      containers:
-      - name: webapp1
-        image: katacoda/docker-http-server:latest
-        ports:
-        - containerPort: 80
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: webapp2
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: webapp2
-    spec:
-      containers:
-      - name: webapp2
-        image: katacoda/docker-http-server:latest
-        ports:
-        - containerPort: 80
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: webapp3
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: webapp3
-    spec:
-      containers:
-      - name: webapp3
-        image: katacoda/docker-http-server:latest
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: webapp1-svc
-  labels:
-    app: webapp1
-spec:
-  ports:
-  - port: 80
-  selector:
-    app: webapp1
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: webapp2-svc
-  labels:
-    app: webapp2
-spec:
-  ports:
-  - port: 80
-  selector:
-    app: webapp2
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: webapp3-svc
-  labels:
-    app: webapp3
-spec:
-  ports:
-  - port: 80
-  selector:
-    app: webapp3
-```
-### 2. 部署ingress服务
-- 创建yaml文件
-```yaml
-apiVersion: v1
-kind: ReplicationController
-metadata:
-  name: nginx-ingress-rc
-  labels:
-    app: nginx-ingress
-spec:
-  replicas: 1
-  selector:
-    app: nginx-ingress
-  template:
-    metadata:
-      labels:
-        app: nginx-ingress
-    spec:
-      containers:
-      - image: nginxdemos/nginx-ingress:0.9.0
-        name: nginx-ingress
-        ports:
-        - containerPort: 80
-          hostPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-ingress-lb
-  labels:
-    app: nginx-ingress
-spec:
-  externalIPs:
-  - 172.17.0.49
-  ports:
-  - port: 80
-    name: http
-    targetPort: 80
-  selector:
-    app: nginx-ingress
-```
-### 3. 创建ingress规则
 
-- 创建yaml文件
+# 安装
+
+```yaml
+#创建clusterrole
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: traefik-ingress-controller
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - services
+      - endpoints
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+
+#将创建的clusterrole和ServiceAccount进行绑定
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: traefik-ingress-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traefik-ingress-controller
+subjects:
+- kind: ServiceAccount
+  name: traefik-ingress-controller
+  namespace: kube-system
+
+#创建ingress使用的ServiceAccount
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traefik-ingress-controller
+  namespace: kube-system
+
+#已deployment的方式进行部署
+---
+kind: Deployment
+apiVersion: apps/v1beta1
+metadata:
+  name: traefik-ingress-controller
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 60
+      containers:
+      - image: traefik:v1.7.4
+        imagePullPolicy: IfNotPresent
+        name: traefik-ingress-lb
+        args:
+        - --api
+        - --kubernetes
+        - --logLevel=INFO
+#创建ingress服务，方式为nodeport
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik-ingress-service
+  namespace: kube-system
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+    - protocol: TCP
+      # 该端口为 traefik ingress-controller的服务端口
+      port: 80
+      # 集群hosts文件中设置的 NODE_PORT_RANGE 作为 NodePort的可用范围
+      # 从默认20000~40000之间选一个可用端口，让ingress-controller暴露给外部的访问
+      nodePort: 23456
+      name: web
+    - protocol: TCP
+      # 该端口为 traefik 的管理WEB界面
+      port: 8080
+      name: admin
+  type: NodePort
+```
+
+# 使用
+
+比如暴露某一项服务
+
 ```yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: webapp-ingress
+  name: apollo-web-ui
 spec:
   rules:
-  - host: my.kubernetes.example
+  - host: apollo.test.com
     http:
       paths:
-      - path: /webapp1
+      - path: /
         backend:
-          serviceName: webapp1-svc
+          serviceName: apollo
           servicePort: 80
-      - path: /webapp2
-        backend:
-          serviceName: webapp2-svc
-          servicePort: 80
-      - backend:
-          serviceName: webapp3-svc
-          servicePort: 80
-```
-- 部署以及查看
 
-```bash
-kubectl create -f ingress-rules.yaml
-#查看
-kubectl get ing
 ```
+
+# 后续ssl
 
