@@ -1,5 +1,5 @@
 ---
-title: kubernetes-ingress路由
+title: pod访问外部服务
 date: 2019-03-22 12:12:28
 tags:
 - kubernetes
