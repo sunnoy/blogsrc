@@ -2,8 +2,6 @@
 title: 浅谈sql高可用
 date: 2018-07-30 17:12:28
 tags:
-- windows
-- sql
 - 浅谈
 ---
 
