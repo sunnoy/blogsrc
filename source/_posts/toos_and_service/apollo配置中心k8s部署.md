@@ -21,6 +21,8 @@ git clone https://github.com/ctripcorp/apollo.git
 
 # 镜像准备
 
+**在构建的镜像的时候，要把admin、config、portal的dockerfile中的`ENTRYPOINT`行注释掉或者删掉。不然会在k8s集群中出现`read-only file system`报错！！！！**
+
 ## apollo-admin
 
 ```bash
@@ -398,7 +400,127 @@ spec:
       restartPolicy: Always
 ```
 
-# 未完成 待续
+# 集群内部署
+
+## 对私有仓库做不安全配置
+
+```bash
+vi /etc/docker/daemon.json
+```
+添加私有源的链接
+
+```json
+{
+  "registry-mirrors": ["https://registry.docker-cn.com", "https://docker.mirrors.ustc.edu.cn"],
+  "insecure-registries": ["harbor.best-xylink.com"],
+}
+```
+
+重启docker服务
+
+```bash
+systemctl restart docker
+```
+
+## 给响应node添加标签
+
+服务admin、config、portal均需要标签
+
+```bash
+kubectl label nodes ${node-ip} --overwirte node=dev
+```
+
+## 创建namespace
+
+```bash
+kubectl create namespace sre
+```
+
+## 准备相关yaml文件
+
+```bash
+#查看文件
+
+tree apollo
+├── dev
+│   ├── service-apollo-admin-server-dev.yaml
+│   ├── service-apollo-config-server-dev.yaml
+│   └── service-mysql-for-apollo-dev-env.yaml
+├── prod
+│   ├── service-apollo-admin-server-prod.yaml
+│   ├── service-apollo-config-server-prod.yaml
+│   └── service-mysql-for-apollo-prod-env.yaml
+└── service-apollo-portal-server.yaml
+```
+
+## 执行部署
+
+```bash
+#首先部署dev环境，因为其他的服务要使用他的服务注册中心
+kubectl apply -f service-mysql-for-apollo-dev-env.yaml --record && \
+kubectl apply -f service-apollo-config-server-dev.yaml --record && \
+kubectl apply -f service-apollo-admin-server-dev.yaml --record
+
+#然后不是prod环境
+kubectl apply -f service-mysql-for-apollo-prod-env.yaml --record && \
+kubectl apply -f service-apollo-config-server-prod.yaml --record && \
+kubectl apply -f service-apollo-admin-server-prod.yaml --record
+
+# 最后部署 portal管理界面
+kubectl apply -f service-apollo-portal-server.yaml --record
+
+
+```
+
+## 删除部署
+
+```bash
+kubectl delete -f service-mysql-for-apollo-dev-env.yaml
+```
+
+# 查看部署
+
+## 查看node
+
+```bash
+[root@dev-k8s-node1 apollo]# kubectl get pod -n sre 
+NAME                                                   READY   STATUS    RESTARTS   AGE
+deployment-apollo-admin-server-dev-6f54ccd796-5x7fz    1/1     Running   0          35m
+deployment-apollo-admin-server-dev-6f54ccd796-mncbh    1/1     Running   0          35m
+deployment-apollo-admin-server-dev-6f54ccd796-rwjr6    1/1     Running   0          35m
+deployment-apollo-admin-server-prod-756bdb4bcc-5hphc   1/1     Running   0          72m
+deployment-apollo-admin-server-prod-756bdb4bcc-dhd45   1/1     Running   0          72m
+deployment-apollo-admin-server-prod-756bdb4bcc-fkpqn   1/1     Running   0          72m
+deployment-apollo-portal-server-868f74d454-fcdmm       1/1     Running   0          33m
+deployment-apollo-portal-server-868f74d454-l72kg       1/1     Running   0          42m
+deployment-apollo-portal-server-868f74d454-mpmh8       1/1     Running   0          42m
+statefulset-apollo-config-server-dev-0                 1/1     Running   0          83m
+statefulset-apollo-config-server-dev-1                 1/1     Running   0          82m
+statefulset-apollo-config-server-dev-2                 1/1     Running   0          82m
+statefulset-apollo-config-server-prod-0                1/1     Running   0          72m
+statefulset-apollo-config-server-prod-1                1/1     Running   0          72m
+statefulset-apollo-config-server-prod-2                1/1     Running   0          71m
+
+```
+
+## 查看svc
+
+```bash
+[root@dev-k8s-node1 apollo]# kubectl get svc -n sre 
+NAME                                TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service-apollo-admin-server-dev     ClusterIP   10.68.101.110   <none>        8090/TCP         36m
+service-apollo-admin-server-prod    ClusterIP   10.68.234.143   <none>        8090/TCP         73m
+service-apollo-config-server-dev    NodePort    10.68.185.10    <none>        8080:30002/TCP   84m
+service-apollo-config-server-prod   NodePort    10.68.229.144   <none>        8080:30005/TCP   73m
+service-apollo-meta-server-dev      ClusterIP   None            <none>        8080/TCP         84m
+service-apollo-meta-server-prod     ClusterIP   None            <none>        8080/TCP         73m
+service-apollo-portal-server        NodePort    10.68.67.33     <none>        8070:30001/TCP   66m
+service-mysql-for-apollo-dev-env    ClusterIP   10.68.17.239    <none>        3306/TCP         104m
+service-mysql-for-apollo-prod-env   ClusterIP   10.68.221.124   <none>        3306/TCP         73m
+service-mysql-for-portal-server     ClusterIP   10.68.40.79     <none>        3306/TCP         66m
+
+```
+
 
 
 
