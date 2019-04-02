@@ -400,6 +400,8 @@ spec:
       restartPolicy: Always
 ```
 
+然后，对dev环境进行响应的替换
+
 # 集群内部署
 
 ## 对私有仓库做不安全配置
@@ -461,7 +463,7 @@ kubectl apply -f service-mysql-for-apollo-dev-env.yaml --record && \
 kubectl apply -f service-apollo-config-server-dev.yaml --record && \
 kubectl apply -f service-apollo-admin-server-dev.yaml --record
 
-#然后不是prod环境
+#然后部署prod环境
 kubectl apply -f service-mysql-for-apollo-prod-env.yaml --record && \
 kubectl apply -f service-apollo-config-server-prod.yaml --record && \
 kubectl apply -f service-apollo-admin-server-prod.yaml --record
@@ -480,7 +482,7 @@ kubectl delete -f service-mysql-for-apollo-dev-env.yaml
 
 # 查看部署
 
-## 查看node
+## 查看pod
 
 ```bash
 [root@dev-k8s-node1 apollo]# kubectl get pod -n sre 
