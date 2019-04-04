@@ -11,6 +11,8 @@ Apollo是携程开源的分布式配置中心。那么在微服务时代为什�
 
 ![配置中心](https://qiniu.li-rui.top/配置中心.png)
 
+**在k8s中分布式部署中，每一个环境都要有一套admin config 注册中心。webui可以使用一套**
+
 <!--more-->
 
 # 仓库拉取
@@ -163,7 +165,7 @@ subsets:
 需要修改的字段
 
 - spring.datasource.url中数据库用户名称和密码
-- eureka指定的服务发现服务器组 可选
+- eureka指定的服务发现服务器组，**必须要更改成prod注册服务地址**
 - image自己构建镜像的tag
 - nodePort端口 可选
 
