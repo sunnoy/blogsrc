@@ -23,7 +23,7 @@ git clone https://github.com/ctripcorp/apollo.git
 
 # 镜像准备
 
-**在构建的镜像的时候，要把admin、config、portal的dockerfile中的`ENTRYPOINT`行注释掉或者删掉。不然会在k8s集群中出现`read-only file system`报错！！！！**
+~~**在构建的镜像的时候，要把admin、config、portal的dockerfile中的`ENTRYPOINT`行注释掉或者删掉。不然会在k8s集群中出现`read-only file system`报错！！！！**~~ 这问题博主已经向Apollo提交了pr，已经合并进去了，详情[请查看](https://github.com/ctripcorp/apollo/pull/2113)
 
 ## apollo-admin
 
@@ -165,7 +165,7 @@ subsets:
 需要修改的字段
 
 - spring.datasource.url中数据库用户名称和密码
-- eureka指定的服务发现服务器组，**必须要更改成prod注册服务地址**
+- eureka指定的服务发现服务器组
 - image自己构建镜像的tag
 - nodePort端口 可选
 
