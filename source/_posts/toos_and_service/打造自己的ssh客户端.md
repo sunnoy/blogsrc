@@ -39,6 +39,12 @@ complete -W "$(echo $(grep '^Host ' .ssh/config  | sort -u | sed 's/^ssh //'))" 
 EOF
 ```
 
+## 多个config文件时
+
+```bash
+complete -W "$(echo $(grep '^Host ' .ssh/config .ssh/config2  | sort -u | sed 's/^ssh //'))" ssh
+```
+
 配置完成后
 
 ```bash
