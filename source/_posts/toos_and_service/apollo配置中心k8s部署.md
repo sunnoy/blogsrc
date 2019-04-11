@@ -524,6 +524,46 @@ service-mysql-for-apollo-prod-env   ClusterIP   10.68.221.124   <none>        33
 service-mysql-for-portal-server     ClusterIP   10.68.40.79     <none>        3306/TCP         66m
 
 ```
+# 应用接入
+
+通过环境变量的方式进行接入，初始配置进行应用内固化，仅仅改变meta server地址和端口
+
+## 以spring boot为例
+
+### 初始配置信息
+
+配置文件`src/main/resources/application.properties`
+
+```bash
+app.id=txRest
+#apollo.meta=http://106.12.25.204:8080
+apollo.cacheDir=/opt/data
+apollo.bootstrap.enabled = true
+spring.application.name=txRest
+```
+
+### Dockerfile 引入环境变量
+
+```Dockerfile
+ENV apollo_meta dd
+CMD /usr/bin/java -jar -Dapollo.meta=$apollo_meta xxx.jar
+```
+
+### 进行环境变量注入
+
+```yaml
+      containers:
+        - image: sssss
+          imagePullPolicy: Always
+          name: sssss
+          ports:
+            - protocol: TCP
+              containerPort: 8080
+          
+          env:
+            - name: apollo_meta
+              value: "http://service-apollo-config-server-dev.sre:8080"
+```
 
 
 
