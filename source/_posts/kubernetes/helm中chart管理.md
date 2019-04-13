@@ -312,3 +312,476 @@ type: kubernetes.io/dockerconfigjson
 data:
   .dockerconfigjson: {{ template "imagePullSecret" . }}
 ```
+
+# 模板编写
+
+## 文件概览
+
+```bash
+├── templates # 主要是渲染的模板文件，通过values.yaml中的值来渲染出k8s的yaml文件
+│   ├── deployment.yaml
+│   ├── _helpers.tpl #在模板渲染中可以复用的小模板段 一般以tpl结尾
+│   ├── ingress.yaml
+│   ├── NOTES.txt #执行helm install显示的内容
+│   ├── service.yaml
+│   └── tests
+│       └── test-connection.yaml
+```
+## NOTE.txt
+
+进行安装的显示提示信息，里面也是可以进行相关的变量引入
+
+```yaml
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get {{ .Release.Name }}
+```
+
+## 变量的namespace与内建对象
+
+helm认为变量都是在不同的namespace中，namespace和其中的变量使用`.`隔离。比如`.Release.Name` 含义就是：在顶层namespace中找对象`Release`然后获取里面的对象`Name` 。
+
+内建对象一般首字母大写，主要有
+- Release 每次的helm install就是一次Release，该对象包含了该次安装的一些元数据
+- Values 文件values.yml构成的对象，主要是同文件定义中获取变量定义
+- Chart 文件Chart.yaml构成的对象，来获取该文件内的信息
+- Files 获取chart中的其他文件
+- Capabilities 获取k8s中的元数据，比如API版本以及集群版本等信息
+- Template 包含当前执行的模板文件的元数据，比如文件名称以及文件所在路径
+
+
+### Values Files
+
+通过`Values`可以获取到的变量有四种类型，变量优先级依次提高
+
+- 文件values.yaml
+- 依赖chart中的也可以获取到主chart中的变量
+- 命令 helm install 和 helm upgrade 中参数 -f 传递的变量文件中的变量
+- 通过 --set 参数传递的键值对变量 优先级最高
+
+values.yaml中的层级调用，类似json对象调用
+
+```yaml
+
+favorite:
+  drink: coffee
+  food: pizza
+```
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: "Hello World"
+  drink: {{ .Values.favorite.drink }}
+  food: {{ .Values.favorite.food }}
+```
+
+### 改变yaml中的字段
+
+通过将相关字段的值设置为`null`
+
+原来为
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /user/login
+    port: http
+  initialDelaySeconds: 120
+```
+
+先要探针类型改为exec，执行命令
+
+```bash
+#关键字段 --set livenessProbe.httpGet=null
+helm install stable/drupal --set livenessProbe.exec.command=[cat,docroot/CHANGELOG.txt] --set livenessProbe.httpGet=null
+```
+
+结果为
+
+```yaml
+livenessProbe:
+  exec:
+    command:
+    - cat
+    - docroot/CHANGELOG.txt
+  initialDelaySeconds: 120
+
+```
+
+## 模板函数和管道
+
+### 函数
+
+函数的使用格式为
+
+```yaml
+{{ 函数名称 参数1 参数2 }}
+```
+
+示例
+
+quote 函数会给变量添加双引号
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: "Hello World"
+  drink: {{ quote .Values.favorite.drink }}
+  food: {{ quote .Values.favorite.food }}
+```
+
+默认函数
+
+```yaml
+drink: {{ .Values.favorite.drink | default "tea" | quote }}
+```
+
+### 管道
+
+管道和Linux中的管道是一样的，管道符号为`|`。管道左侧为管道右侧函数的参数
+
+示例
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: "Hello World"
+  drink: {{ .Values.favorite.drink | quote }}
+  food: {{ .Values.favorite.food | upper | quote }}
+```
+
+## 流程控制
+
+### 运算符号
+
+运算符号和Linux中shell的运算符号也是一样的
+
+- eq
+- ne
+- lt
+- gt
+- and
+- or
+- not
+
+### if/else
+
+基础格式
+
+```yaml
+{{ if PIPELINE }}
+  # Do something
+{{ else if OTHER PIPELINE }}
+  # Do something else
+{{ else }}
+  # Default case
+{{ end }}
+```
+
+示例
+
+**模板引擎会将流程控制语句删除留空，因此会留下空行，`{{- `用于删除空行**
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: "Hello World"
+  drink: {{ .Values.favorite.drink | default "tea" | quote }}
+  #*删除换行符
+  food: {{ .Values.favorite.food | upper | quote }}*
+  #- 用于删除空行
+  {{- if eq .Values.favorite.drink "coffee"}}
+  mug: true*
+  {{- end}}
+```
+
+### 使用with来指定对象
+
+看一下示例就明白了
+
+```yaml
+  {{- with .Values.favorite }}
+  drink: {{ .drink | default "tea" | quote }}
+  food: {{ .food | upper | quote }}
+  {{- end }}
+  #超范围的要另起一行
+  release: {{ .Release.Name }}
+```
+
+### range循环
+
+还是看示例
+
+数据源
+
+```yaml
+favorite:
+  drink: coffee
+  food: pizza
+pizzaToppings:
+  - mushrooms
+  - cheese
+  - peppers
+  - onions
+```
+
+使用range迭代
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: "Hello World"
+  {{- with .Values.favorite }}
+  drink: {{ .drink | default "tea" | quote }}
+  food: {{ .food | upper | quote }}
+  {{- end }}
+
+  # 注意下面使用 . 来进行代表数组pizzaToppings的元素
+  toppings: |- 
+    {{- range .Values.pizzaToppings }}
+    - {{ . | title | quote }}
+    {{- end }}
+```
+
+yaml中的字符块，详见[yaml标准](https://yaml.org/spec/1.2/spec.html)
+
+```bash
+|: 保留换行看，末尾空行删除
+|-: 删除换行，末尾空行删除
+|+: 保留换行，末尾空行保留
+```
+
+当然如果迭代的数据源比较少就可以直接写出迭代的数据元素，还是看示例
+
+这里用了数据类型`tuple`
+
+```yaml
+  sizes: |-
+    {{- range tuple "small" "medium" "large" }}
+    - {{ . }}
+    {{- end }}
+```
+
+## 变量
+
+模板变量中的赋值与引用
+
+```yaml
+#赋值
+{{- $relname := .Release.Name -}}
+
+#引用
+release: {{ $relname }}
+
+#仅使用一个 $ 就回指向 root namespace变量
+{{ $.Chart.Name }}-{{ $.Chart.Version }}
+```
+
+在with中的使用
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: "Hello World"
+  {{- $relname := .Release.Name -}}
+  {{- with .Values.favorite }}
+  drink: {{ .drink | default "tea" | quote }}
+  food: {{ .food | upper | quote }}
+  release: {{ $relname }}
+  {{- end }}
+```
+
+在range中的使用，类似python中的字典迭代
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: "Hello World"
+  {{- range $key, $val := .Values.favorite }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end}}
+```
+
+## 子模板
+
+子模板文件名称都是以`_`开始，拓展名称一般为`.tpl`
+
+模板的定义和引用，定义使用关键字`define`，使用则是`tmplate`
+
+```yaml
+#定义模板，这个一般放在_helpers.tpl里面，也是可以访问得到的
+{{- define "mychart.labels" }}
+  labels:
+    generator: helm
+    date: {{ now | htmlDate }}
+
+    #这里用到了root namesapce中的变量
+    chart: {{ .Chart.Name }}
+    version: {{ .Chart.Version }}
+{{- end }}
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+
+  #使用模板，因为使用了root namespace中的变量 因此需要在
+  #使用子模板的时候在后面加上其他的namespace  . 以及 .Vaules 等
+  {{- template "mychart.labels" . }}
+data:
+  myvalue: "Hello World"
+  {{- range $key, $val := .Values.favorite }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+```
+
+### include 函数
+
+include函数主要是以函数的方式引入子模板，上面的template是以动作的方式来引入模板，造成yaml中的缩进问题。通过include的函数引入就可以使用管道然后传递给nindent函数来修正缩进
+
+include包含两个参数，一个是子模板名称，另一个是子模板中的变量范围如：`{{- include "mychart.app" . }}`
+
+```yaml
+#定义变量
+{{- define "mychart.app" -}}
+app_name: {{ .Chart.Name }}
+app_version: "{{ .Chart.Version }}+{{ .Release.Time.Seconds }}"
+{{- end -}}
+
+#使用
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  labels:
+    # nindent后面的数字 为向又缩进几个字符的空间
+    {{- include "mychart.app" . | nindent 4 }}
+data:
+  myvalue: "Hello World"
+  {{- range $key, $val := .Values.favorite }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+  {{- include "mychart.app" . | nindent 2 }}
+```
+
+## 在模板中引入非模板文件
+
+现在目录mychart内有三个文件，第二行为文件内容，这些文件在chart根目录下面，不是在template目录下面喔
+
+```bash
+config1.toml:
+message = Hello from config 1
+
+
+config2.toml:
+message = This is config 2
+
+
+config3.toml:
+message = Goodbye from config 3
+```
+
+模板编写
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  #前面讲的很多知识点都用上了喔，变量引用 range tuple
+  {{- $files := .Files }}
+  {{- range tuple "config1.toml" "config2.toml" "config3.toml" }}
+  #此处的 . 为文件名称 下面的 {{ $files.Get . }} 为获取文件内容
+  {{ . }}: |-
+    {{ $files.Get . }}
+  {{- end }}
+```
+
+渲染出来就是
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quieting-giraf-configmap
+data:
+  config1.toml: |-
+    message = Hello from config 1
+
+  config2.toml: |-
+    message = This is config 2
+
+  config3.toml: |-
+    message = Goodbye from config 3
+```
+
+### 使用glob匹配文件
+
+文件多的时候用来搜索文件，[匹配语法](https://godoc.org/github.com/gobwas/glob)
+
+```yaml
+{{ $root := . }}
+#查找yaml结尾的文件
+{{ range $path, $bytes := .Files.Glob "**.yaml" }}
+{{ $path }}: |-
+{{ $root.Files.Get $path }}
+{{ end }}
+```
+
+### 使用函数直接引入configmap和secret
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: conf
+data:
+  {{- (.Files.Glob "foo/*").AsConfig | nindent 2 }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: very-secret
+type: Opaque
+data:
+  {{- (.Files.Glob "bar/*").AsSecrets | nindent 2 }}
+
+#使用base64加密
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-secret
+type: Opaque
+data:
+  token: |-
+    {{ .Files.Get "config1.toml" | b64enc }}
+```
