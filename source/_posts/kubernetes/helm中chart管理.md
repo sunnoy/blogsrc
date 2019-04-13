@@ -484,7 +484,18 @@ data:
   # Default case
 {{ end }}
 ```
+### 使用with来指定对象
 
+看一下示例就明白了
+
+```yaml
+  {{- with .Values.favorite }}
+  drink: {{ .drink | default "tea" | quote }}
+  food: {{ .food | upper | quote }}
+  {{- end }}
+  #超范围的要另起一行
+  release: {{ .Release.Name }}
+```
 
 
 
