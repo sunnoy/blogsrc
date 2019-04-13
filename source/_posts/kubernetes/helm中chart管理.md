@@ -496,7 +496,61 @@ data:
   #超范围的要另起一行
   release: {{ .Release.Name }}
 ```
+### range循环
 
+还是看示例
+
+数据源
+
+```yaml
+favorite:
+  drink: coffee
+  food: pizza
+pizzaToppings:
+  - mushrooms
+  - cheese
+  - peppers
+  - onions
+```
+
+使用range迭代
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: "Hello World"
+  {{- with .Values.favorite }}
+  drink: {{ .drink | default "tea" | quote }}
+  food: {{ .food | upper | quote }}
+  {{- end }}
+
+  # 注意下面使用 . 来进行代表数组pizzaToppings的元素
+  toppings: |- 
+    {{- range .Values.pizzaToppings }}
+    - {{ . | title | quote }}
+    {{- end }}
+```
+yaml中的字符块，详见[yaml标准](https://yaml.org/spec/1.2/spec.html)
+
+```bash
+|: 保留换行看，末尾空行删除
+|-: 删除换行，末尾空行删除
+|+: 保留换行，末尾空行保留
+```
+
+当然如果迭代的数据源比较少就可以直接写出迭代的数据元素，还是看示例
+
+这里用了数据类型`tuple`
+
+```yaml
+  sizes: |-
+    {{- range tuple "small" "medium" "large" }}
+    - {{ . }}
+    {{- end }}
+```
 
 
 
