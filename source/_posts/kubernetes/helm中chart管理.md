@@ -465,67 +465,6 @@ data:
   food: {{ .Values.favorite.food | upper | quote }}
 ```
 
-## 流程控制
-
-### 运算符号
-
-运算符号和Linux中shell的运算符号也是一样的
-
-- eq
-- ne
-- lt
-- gt
-- and
-- or
-- not
-
-### if/else
-
-基础格式
-
-```yaml
-{{ if PIPELINE }}
-  # Do something
-{{ else if OTHER PIPELINE }}
-  # Do something else
-{{ else }}
-  # Default case
-{{ end }}
-```
-
-示例
-
-**模板引擎会将流程控制语句删除留空，因此会留下空行，`{{- `用于删除空行**
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-configmap
-data:
-  myvalue: "Hello World"
-  drink: {{ .Values.favorite.drink | default "tea" | quote }}
-  #*删除换行符
-  food: {{ .Values.favorite.food | upper | quote }}*
-  #- 用于删除空行
-  {{- if eq .Values.favorite.drink "coffee"}}
-  mug: true*
-  {{- end}}
-```
-
-### 使用with来指定对象
-
-看一下示例就明白了
-
-```yaml
-  {{- with .Values.favorite }}
-  drink: {{ .drink | default "tea" | quote }}
-  food: {{ .food | upper | quote }}
-  {{- end }}
-  #超范围的要另起一行
-  release: {{ .Release.Name }}
-```
-
 
 
 
