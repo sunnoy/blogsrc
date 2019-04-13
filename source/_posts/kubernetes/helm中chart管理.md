@@ -465,6 +465,35 @@ data:
   food: {{ .Values.favorite.food | upper | quote }}
 ```
 
+## 流程控制
+
+### 运算符号
+
+运算符号和Linux中shell的运算符号也是一样的
+
+- eq
+- ne
+- lt
+- gt
+- and
+- or
+- not
+
+### if/else
+
+基础格式
+
+```yaml
+{{ if PIPELINE }}
+  # Do something
+{{ else if OTHER PIPELINE }}
+  # Do something else
+{{ else }}
+  # Default case
+{{ end }}
+```
+
+
 
 
 
