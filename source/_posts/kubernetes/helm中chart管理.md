@@ -733,5 +733,145 @@ data:
 ```
 
 
+### 使用函数直接引入configmap和secret
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: conf
+data:
+  {{- (.Files.Glob "foo/*").AsConfig | nindent 2 }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: very-secret
+type: Opaque
+data:
+  {{- (.Files.Glob "bar/*").AsSecrets | nindent 2 }}
+
+#使用base64加密
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-secret
+type: Opaque
+data:
+  token: |-
+    {{ .Files.Get "config1.toml" | b64enc }}
+```
+
+
+# subcharts 依赖使用
+
+一些规定
+
+- 依赖的chart不可以使用主chart的变量
+- 主chart变量可以覆盖依赖chart的变量
+- global 的变量谁都可以使用
+
+## 创建subchart
+
+```bash
+cd mychart/charts
+helm create mysubchart
+```
+
+## global值
+
+```yaml
+favorite:
+  drink: coffee
+  food: pizza
+pizzaToppings:
+  - mushrooms
+  - cheese
+  - peppers
+  - onions
+
+mysubchart:
+  dessert: ice cream
+
+#这里使用关键字 global
+global:
+  salad: caesar
+
+#使用
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  salad: {{ .Values.global.salad }}
+```
+
+# 构建私有chart仓库
+
+本质是搭建一个web容器
+
+## 目录准备
+
+### chart源码目录
+
+```bash
+mkdir chatrepo
+
+#创建多个chat目录 里面的一个文件夹就是一个chart
+
+ls chatrepo
+
+xylinkchart
+
+```
+
+### chart web文件目录
+
+```bash
+mkdir chatweb
+```
+
+## 打包chart
+
+```bash
+helm package chatrepo/* -d chatweb
+```
+
+## 初始化chatweb中元数据
+
+```bash
+#初始化元数据会产生文件 index.yaml
+helm repo index chatweb
+```
+
+## 本地测试
+
+### 创建web服务
+
+```bash
+helm serve --address=0.0.0.0:8800 --repo-path=chatweb
+```
+
+### 添加自定义repo
+
+```bash
+helm repo add test http://127.0.0.1:8800
+```
+
+### 搜索自定义chart
+
+```bash
+#支持模糊搜索
+helm search link
+NAME             	CHART VERSION	APP VERSION	DESCRIPTION
+test/linkchart 	0.1.0        	1.0        	A Helm chart for Kubernetes linkchart
+```
+
+
+
+
+
+
+
 
 
