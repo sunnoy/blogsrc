@@ -667,5 +667,71 @@ data:
 
 
 
+## 在模板中引入非模板文件
+
+现在目录mychart内有三个文件，第二行为文件内容，这些文件在chart根目录下面，不是在template目录下面喔
+
+```bash
+config1.toml:
+message = Hello from config 1
+
+
+config2.toml:
+message = This is config 2
+
+
+config3.toml:
+message = Goodbye from config 3
+```
+
+模板编写
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  #前面讲的很多知识点都用上了喔，变量引用 range tuple
+  {{- $files := .Files }}
+  {{- range tuple "config1.toml" "config2.toml" "config3.toml" }}
+  #此处的 . 为文件名称 下面的 {{ $files.Get . }} 为获取文件内容
+  {{ . }}: |-
+    {{ $files.Get . }}
+  {{- end }}
+```
+
+渲染出来就是
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quieting-giraf-configmap
+data:
+  config1.toml: |-
+    message = Hello from config 1
+
+  config2.toml: |-
+    message = This is config 2
+
+  config3.toml: |-
+    message = Goodbye from config 3
+```
+
+### 使用glob匹配文件
+
+文件多的时候用来搜索文件，[匹配语法](https://godoc.org/github.com/gobwas/glob)
+
+```yaml
+{{ $root := . }}
+#查找yaml结尾的文件
+{{ range $path, $bytes := .Files.Glob "**.yaml" }}
+{{ $path }}: |-
+{{ $root.Files.Get $path }}
+{{ end }}
+```
+
+
 
 
