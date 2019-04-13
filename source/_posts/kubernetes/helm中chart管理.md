@@ -277,3 +277,38 @@ metadata:
 10. Ttiller等待资源状态成ready
 11. Tiller返回release名称
 12. helm客户端退出
+
+
+
+# 私有仓库认证
+
+## values.yaml中定义
+
+```yaml
+imageCredentials:
+  registry: quay.io
+  username: someone
+  password: sillyness
+```
+
+## 创建helper
+
+_helpers.tpl
+
+```yaml
+{{- define "imagePullSecret" }}
+{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.imageCredentials.registry (printf "%s:%s" .Values.imageCredentials.username .Values.imageCredentials.password | b64enc) | b64enc }}
+{{- end }}
+```
+
+## 模板中使用
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: myregistrykey
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ template "imagePullSecret" . }}
+```
