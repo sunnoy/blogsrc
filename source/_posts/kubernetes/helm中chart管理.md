@@ -564,22 +564,5 @@ data:
     {{- end }}
 ```
 
-yaml中的字符块，详见[yaml标准](https://yaml.org/spec/1.2/spec.html)
 
-```bash
-|: 保留换行看，末尾空行删除
-|-: 删除换行，末尾空行删除
-|+: 保留换行，末尾空行保留
-```
-
-当然如果迭代的数据源比较少就可以直接写出迭代的数据元素，还是看示例
-
-这里用了数据类型`tuple`
-
-```yaml
-  sizes: |-
-    {{- range tuple "small" "medium" "large" }}
-    - {{ . }}
-    {{- end }}
-```
 
