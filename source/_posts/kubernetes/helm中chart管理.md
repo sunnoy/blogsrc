@@ -158,3 +158,36 @@ wordpress:
 
 所有以`_`前缀的文件都不会被渲染成k8s的yaml文件
 
+## 定义变量
+
+### 基础变量
+
+通过文件 values.yaml定义
+
+```yaml
+#文件 values.yaml
+imageRegistry: "quay.io/deis"
+dockerTag: "latest"
+pullPolicy: "Always"
+storage: "s3"
+```
+
+### 变量范围与继承
+
+```yaml
+title: "My WordPress Site" # 当前chart
+mysql:
+  max_connections: 100 # 被当前chart的依赖mysql使用
+  password: "secret"
+
+apache:
+  port: 8080 # 被当前chart的依赖Apache使用
+```
+
+当前chart可以通过`.Values.mysql.password`来访问变量，依赖chart不可以访问`.Values.title`。mysql可以访问`apache.port`
+
+
+## 预定义变量
+
+- Release 对象
+- Chart 对象
