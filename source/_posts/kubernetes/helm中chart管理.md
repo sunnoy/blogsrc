@@ -635,5 +635,36 @@ data:
 
 
 
+### include 函数
+
+include函数主要是以函数的方式引入子模板，上面的template是以动作的方式来引入模板，造成yaml中的缩进问题。通过include的函数引入就可以使用管道然后传递给nindent函数来修正缩进
+
+include包含两个参数，一个是子模板名称，另一个是子模板中的变量范围如：`{{- include "mychart.app" . }}`
+
+```yaml
+#定义变量
+{{- define "mychart.app" -}}
+app_name: {{ .Chart.Name }}
+app_version: "{{ .Chart.Version }}+{{ .Release.Time.Seconds }}"
+{{- end -}}
+
+#使用
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  labels:
+    # nindent后面的数字 为向又缩进几个字符的空间
+    {{- include "mychart.app" . | nindent 4 }}
+data:
+  myvalue: "Hello World"
+  {{- range $key, $val := .Values.favorite }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+  {{- include "mychart.app" . | nindent 2 }}
+```
+
+
+
 
 
