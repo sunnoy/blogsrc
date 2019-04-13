@@ -1,9 +1,9 @@
 language: node_js
 node_js: stable
-cache: 
-  directories:
-    - node_modules
-    - public
+#cache: 
+#  directories:
+#    - node_modules
+#    - public
 script:
   - export TZ='Asia/Shanghai'
   - npm install

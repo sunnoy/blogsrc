@@ -553,6 +553,87 @@ yaml中的字符块，详见[yaml标准](https://yaml.org/spec/1.2/spec.html)
 ```
 
 
+## 变量
+
+模板变量中的赋值与引用
+
+```yaml
+#赋值
+{{- $relname := .Release.Name -}}
+
+#引用
+release: {{ $relname }}
+
+#仅使用一个 $ 就回指向 root namespace变量
+{{ $.Chart.Name }}-{{ $.Chart.Version }}
+```
+
+在with中的使用
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: "Hello World"
+  {{- $relname := .Release.Name -}}
+  {{- with .Values.favorite }}
+  drink: {{ .drink | default "tea" | quote }}
+  food: {{ .food | upper | quote }}
+  release: {{ $relname }}
+  {{- end }}
+```
+
+在range中的使用，类似python中的字典迭代
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: "Hello World"
+  {{- range $key, $val := .Values.favorite }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end}}
+```
+
+## 子模板
+
+子模板文件名称都是以`_`开始，拓展名称一般为`.tpl`
+
+模板的定义和引用，定义使用关键字`define`，使用则是`tmplate`
+
+```yaml
+#定义模板，这个一般放在_helpers.tpl里面，也是可以访问得到的
+{{- define "mychart.labels" }}
+  labels:
+    generator: helm
+    date: {{ now | htmlDate }}
+
+    #这里用到了root namesapce中的变量
+    chart: {{ .Chart.Name }}
+    version: {{ .Chart.Version }}
+{{- end }}
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+
+  #使用模板，因为使用了root namespace中的变量 因此需要在
+  #使用子模板的时候在后面加上其他的namespace  . 以及 .Vaules 等
+  {{- template "mychart.labels" . }}
+data:
+  myvalue: "Hello World"
+  {{- range $key, $val := .Values.favorite }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+```
+
+
 
 
 
