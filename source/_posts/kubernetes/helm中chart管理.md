@@ -1,5 +1,5 @@
 ---
-title: helm中chart编写
+title: helm中chart管理
 date: 2019-4-11 12:12:28
 tags:
 - kubernetes
@@ -18,6 +18,9 @@ helm lint mychart
 
 #试运行
 helm install --dry-run --debug
+
+# USER-SUPPLIED VALUES --set ss=ss 的变量
+helm install --dry-run --debug --set ss=ss
 
 #获取k8s manifest文件
 helm get manifest
@@ -57,7 +60,7 @@ helm get manifest
 
 chart中的版本展示休要用到语义化版本
 
-[相见](https://semver.org/lang/zh-CN/)
+[详见](https://semver.org/lang/zh-CN/)
 
 ## chart.yaml
 
@@ -417,6 +420,8 @@ livenessProbe:
 
 示例
 
+quote 函数会给变量添加双引号
+
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -481,6 +486,8 @@ data:
 
 示例
 
+**模板引擎会将流程控制语句删除留空，因此会留下空行，`{{- `用于删除空行**
+
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -491,10 +498,10 @@ data:
   drink: {{ .Values.favorite.drink | default "tea" | quote }}
   #*删除换行符
   food: {{ .Values.favorite.food | upper | quote }}*
-  #- 用于删除空格
-**{{- if eq .Values.favorite.drink "coffee"}}
+  #- 用于删除空行
+  {{- if eq .Values.favorite.drink "coffee"}}
   mug: true*
-**{{- end}}
+  {{- end}}
 ```
 
 ### 使用with来指定对象
@@ -548,7 +555,11 @@ data:
     {{- end }}
 ```
 
-上面`|-`表示的是后面是一堆字符串，这些字符串并不是yaml格式
+yaml中的字符块，详见[yaml标准](https://yaml.org/spec/1.2/spec.html)
+
+- >, |: 保留换行看，末尾空行删除
+- >-, |-: 删除换行，末尾空行删除
+- >+, |+: 保留换行，末尾空行保留
 
 当然如果迭代的数据源比较少就可以直接写出迭代的数据元素，还是看示例
 
@@ -645,6 +656,8 @@ data:
 
 include函数主要是以函数的方式引入子模板，上面的template是以动作的方式来引入模板，造成yaml中的缩进问题。通过include的函数引入就可以使用管道然后传递给nindent函数来修正缩进
 
+include包含两个参数，一个是子模板名称，另一个是子模板中的变量范围如：`{{- include "mychart.app" . }}`
+
 ```yaml
 #定义变量
 {{- define "mychart.app" -}}
@@ -658,6 +671,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-configmap
   labels:
+    # nindent后面的数字 为向又缩进几个字符的空间
     {{- include "mychart.app" . | nindent 4 }}
 data:
   myvalue: "Hello World"
@@ -669,7 +683,7 @@ data:
 
 ## 在模板中引入非模板文件
 
-现在目录mychart内有三个文件，第二行为文件内容
+现在目录mychart内有三个文件，第二行为文件内容，这些文件在chart根目录下面，不是在template目录下面喔
 
 ```bash
 config1.toml:
@@ -803,6 +817,69 @@ metadata:
 data:
   salad: {{ .Values.global.salad }}
 ```
+
+# 构建私有chart仓库
+
+本质是搭建一个web容器
+
+## 目录准备
+
+### chart源码目录
+
+```bash
+mkdir chatrepo
+
+#创建多个chat目录 里面的一个文件夹就是一个chart
+
+ls chatrepo
+
+xylinkchart
+
+```
+
+### chart web文件目录
+
+```bash
+mkdir chatweb
+```
+
+## 打包chart
+
+```bash
+helm package chatrepo/* -d chatweb
+```
+
+## 初始化chatweb中元数据
+
+初始化元数据会产生文件`index.yaml`
+
+```bash
+helm repo index chatweb
+```
+
+## 本地测试
+
+### 创建web服务
+
+```bash
+helm serve --address=0.0.0.0:8800 --repo-path=chatweb
+```
+
+### 添加自定义repo
+
+```bash
+helm repo add test http://127.0.0.1:8800
+```
+
+### 搜索自定义chart
+
+```bash
+#支持模糊搜索
+helm search link
+NAME             	CHART VERSION	APP VERSION	DESCRIPTION
+test/linkchart 	0.1.0        	1.0        	A Helm chart for Kubernetes linkchart
+```
+
 
 
 
