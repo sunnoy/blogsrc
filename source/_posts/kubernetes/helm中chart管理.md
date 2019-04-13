@@ -191,3 +191,89 @@ apache:
 
 - Release 对象
 - Chart 对象
+
+## 渲染变量
+
+文件values.yaml中的变量需要通过对象`.Values`来引入
+
+```yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: deis-database
+  namespace: deis
+  labels:
+    app.kubernetes.io/managed-by: deis
+spec:
+  replicas: 1
+  selector:
+    app.kubernetes.io/name: deis-database
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: deis-database
+    spec:
+      serviceAccount: deis-database
+      containers:
+        - name: deis-database
+          image: {{.Values.imageRegistry}}/postgres:{{.Values.dockerTag}}
+          imagePullPolicy: {{.Values.pullPolicy}}
+          ports:
+            - containerPort: 5432
+          env:
+            - name: DATABASE_STORAGE
+              value: {{default "minio" .Values.storage}}
+```
+
+
+
+# HOOK配置
+
+
+hook可以在执行chart前后做一些与chart紧密关联的动作，主要是在字段`annotations`中配置
+
+```yaml
+apiVersion: ...
+kind: ....
+metadata:
+  annotations:
+    "helm.sh/hook": "pre-install"
+```
+
+## hook类型
+
+- pre-install: 模板渲染完成后执行，然后创建各种资源
+- post-install: 各种资源在集群中创建完成后执行
+- pre-delete: 删除集群内资源之前进行的删除操作
+- post-delete: 删除集群内资源之后进行的删除操作
+- pre-upgrade: 执行升级，创建集群资源之前
+- post-upgrade: 执行升级在各种资源升级之后
+- pre-rollback: 模板渲染完成后，在进行资源rollback之前
+- post-rollback: 所以rollback操作完成后
+- crd-install: 在进行crd操作时进行安装crd资源
+
+## hook参与的chart生命周期
+
+假设我们现在需要安装一个带pre-install和post-install的chart
+
+1. 我们安装了一个chart
+2. chart被载入到tiller
+3. tiller进行一些验证后开始渲染出资源yaml文件
+
+开始进行hook步骤
+
+4. tiller进行pre-install中的资源部署
+5. 具有多个hook的化按字母排序进行部署
+6. 从排序的底向下部署
+7. 除了crd资源，tiller都会等待资源ready
+
+开始进行chart内资源部署
+
+8. 开始进行chart内资源创建
+
+开始进行post-install hook部署
+
+9. tiller进行部署post-install的资源
+10. Ttiller等待资源状态成ready
+11. Tiller返回release名称
+12. helm客户端退出
