@@ -639,9 +639,10 @@ data:
 
 include函数主要是以函数的方式引入子模板，上面的template是以动作的方式来引入模板，造成yaml中的缩进问题。通过include的函数引入就可以使用管道然后传递给nindent函数来修正缩进
 
-include包含两个参数，一个是子模板名称，另一个是子模板中的变量范围如：`{{- include "mychart.app" . }}`
+
 
 ```yaml
+#include包含两个参数，一个是子模板名称，另一个是子模板中的变量范围如：`{{- include "mychart.app" . }}`
 #定义变量
 {{- define "mychart.app" -}}
 app_name: {{ .Chart.Name }}
