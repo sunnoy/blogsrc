@@ -471,14 +471,6 @@ data:
 
 运算符号和Linux中shell的运算符号也是一样的
 
-- eq
-- ne
-- lt
-- gt
-- and
-- or
-- not
-
 ### if/else
 
 基础格式
@@ -492,6 +484,7 @@ data:
   # Default case
 {{ end }}
 ```
+
 
 
 
