@@ -526,43 +526,7 @@ data:
   release: {{ .Release.Name }}
 ```
 
-### range循环
 
-还是看示例
-
-数据源
-
-```yaml
-favorite:
-  drink: coffee
-  food: pizza
-pizzaToppings:
-  - mushrooms
-  - cheese
-  - peppers
-  - onions
-```
-
-使用range迭代
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-configmap
-data:
-  myvalue: "Hello World"
-  {{- with .Values.favorite }}
-  drink: {{ .drink | default "tea" | quote }}
-  food: {{ .food | upper | quote }}
-  {{- end }}
-
-  # 注意下面使用 . 来进行代表数组pizzaToppings的元素
-  toppings: |- 
-    {{- range .Values.pizzaToppings }}
-    - {{ . | title | quote }}
-    {{- end }}
-```
 
 
 
