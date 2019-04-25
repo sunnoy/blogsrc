@@ -1,5 +1,5 @@
 ---
-title: kubernetes中pod内容抓包
+title: kubernetes中dns查询分析
 date: 2019-4-25 12:12:28
 tags:
 - kubernetes
