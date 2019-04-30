@@ -123,6 +123,8 @@ kubectl expose deployment nginx --port=80 --target-port=8000 --name=nginx
 #向service追加端口
 kubectl expose service nginx --port=443 --target-port=8443 --name=nginx-https
 #通过nodeport方式来暴露 --type= 为ClusterIP, NodePort, LoadBalancer, or ExternalName. 默认为ClusterIP
+#--port 默认为将容器的target port和service port配置一样
+#如果要分别指定 --port=443 --target-port=8443
 kubectl expose deployment nginx --type=NodePort --port=80
 #制定协议
 --protocol=udp

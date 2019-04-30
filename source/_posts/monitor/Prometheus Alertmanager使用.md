@@ -20,13 +20,13 @@ tags:
 
 <!--more-->
 
-## Prometheus对接
+# Prometheus对接
 
 Prometheus需要加入两个配置项
 - 配置文件引入Alertmanager实例
 - 定义出报警规则`alerting rules`
 
-### 引入alertmanager
+## 直接引入alertmanager
 
 ```yml
 alerting:
@@ -46,7 +46,32 @@ alerting:
             - "1.2.3.9:9093"
 ```
 
-### 引入报警规则
+## 通过kubernetes服务发现
+
+```yaml
+alerting:
+  alertmanagers:
+  - kubernetes_sd_configs:
+      - role: pod
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    relabel_configs:
+    - source_labels: [__meta_kubernetes_namespace]
+      regex: default
+      action: keep
+    - source_labels: [__meta_kubernetes_pod_label_app]
+      regex: prometheus
+      action: keep
+    - source_labels: [__meta_kubernetes_pod_label_component]
+      regex: alertmanager
+      action: keep
+    - source_labels: [__meta_kubernetes_pod_container_port_number]
+      regex:
+      action: drop
+```
+
+## 引入报警规则
 
 因为是Prometheus配置文件内引入报警规则，规则内的字段收到配置文件中的`global`字段内容所控制
 
@@ -57,7 +82,7 @@ rule_files:
 
 ## 报警规则编写
 
-### 规则分组rule_group
+###  规则分组rule_group
 
 不论是`recording rules`还是`alerting rules`都要在组里面
 
@@ -69,9 +94,9 @@ groups:
     rules:
       [ - <rule> ... ]
 ```
-### 定义alerting rules
+## 定义alerting rules
 
-#### 规则定义
+### 规则定义
 
 ```yml
 # 定义alert类型并加上名称
@@ -81,7 +106,7 @@ alert: <string>
 #expr: job:request_latency_seconds:mean5m{job="myjob"} > 0.5
 expr: <string>
 
-# 报警间隔
+# 报警间隔，含义就是 当一个报警信息触发以后延迟多少时间再去fire
 [ for: <duration> | default = 0s ]
 
 
@@ -101,7 +126,7 @@ annotations:
 
 ![alert](https://qiniu.li-rui.top/alert.png)
 
-#### label和annotations模板
+### label和annotations模板
 
 label和annotations的值是以模板console templates来渲染的，用到[go模板语言](https://golang.org/pkg/text/template/)，报警注释和标签中常用的是变量`$labels`和`$value`，分别表示一个监控实例和`expr`字段上表达式所拉取的值
 
@@ -113,9 +138,19 @@ annotations:
   description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
 ```
 
-### Prometheus发送格式
+## 评估时间
 
-Prometheus会向Alertmanager的`/api/v1/alerts`发送下面格式的信息
+规则配置以后，默认对规则评估的时间为1m。每隔1m对指标进行查询，看是否满足报警条件
+
+```yaml
+global:
+
+  [ evaluation_interval: <duration> | default = 1m ]
+```
+
+## Prometheus发送格式
+
+在一个评估过程完成以后，并且考虑到了延迟时间，字段 for 的时间后，Prometheus会向Alertmanager的`/api/v1/alerts`发送下面格式的信息
 
 ```json
 [
@@ -135,9 +170,11 @@ Prometheus会向Alertmanager的`/api/v1/alerts`发送下面格式的信息
 ]
 ```
 
-## Alertmanager配置
+到此，prometheus这边就完了，又发送的信息可以知道，一条报警信息包含了许多标签和注释以及时间。这些都是后面alertmanager所要处理的原材料
 
-### 配置概述
+# Alertmanager配置
+
+## 配置概述
 
 Alertmanager可以通过命令行或者配置文件进行配置，官方工具[visual editor](https://prometheus.io/webtools/alerting/routing-tree-editor/)可以将配置文件生成路由树
 
@@ -146,7 +183,7 @@ Alertmanager进程不用重启就可以进行新配置启用，需要：
 - 发送信号`SIGHUP`到进程
 - 同HTTP方式进行POST到`/-/reload`
 
-### 配置文件解析
+## 配置文件解析
 
 配置文件主要有下面几个部分
 
@@ -156,7 +193,8 @@ Alertmanager进程不用重启就可以进行新配置启用，需要：
 - receivers定义不同的接收器，不同的邮箱和微信
 - inhibit_rules静音规则
 
-#### global
+
+## global
 
 定义邮箱服务等
 
@@ -191,7 +229,7 @@ global:
   [ http_config: <http_config> ]
 ```
 
-#### route
+## route
 
 route定义了报警信息的分发策略，receivers定义了发送媒介，两者合在一起就是什么样的报警信息以什么样的形式发送。主要流程
 
@@ -201,30 +239,44 @@ route定义了报警信息的分发策略，receivers定义了发送媒介，两
 
 [路由树查看](https://prometheus.io/webtools/alerting/routing-tree-editor/)
 
-示例
+### 总路由
+
+总路由的默认配置，总路由一定要包含一个 receiver 来充当默认 receiver
 
 ```yml
-#主路由
+#总路由，下面的配置都是各个子路由所继承的配置，如果子路由中没有配置就是使用总路由的配置，子路由中可以覆盖总路由的配置
 route:
-  #定义全路由默认的接受媒介
+  #定义全路由默认的接受者
   receiver: 'default-receiver'
-  #报警是否需要继续向下面节点匹配
+  #报警是否需要继续向兄弟(同级)节点匹配
   [ continue: <boolean> | default = false ]
   #等待还有可能到达的同组报警信息，初次发送一条警报包含多个信息
   [ group_wait: <duration> | default = 30s ]
   #已经存在的group等待group_interval这个时间段看报警问题是否解决
   [ group_interval: <duration> | default = 5m ]
-  #当上次发送完报警信息之后再次发送的间隔
+  #当上次发送完报警信息之后再次发送的间隔，用来重复发送报警信息
   [ repeat_interval: <duration> | default = 4h ]
-
-
-  #根据不同的标签来分组
+  #根据不同的标签来分组，这个主要用来筛选报警信息
   group_by: [cluster, alertname]
+  #使用标签值精确匹配
+  match:
+    [ <labelname>: <labelvalue>, ... ]
+  #使用正则表达进行范围匹配
+  match_re:
+    [ <labelname>: <regex>, ... ]
+
+```
+
+### 子路由
+
+子路由下面可以进行多个信息流匹配，子路由中需要考虑关键子 continue 来确定是否让报警信息在同级子路由中传递
+
+```yaml
+route:
   # 子路由
   routes:
   - receiver: 'database-pager'
-    group_wait: 10s
-    #以正则表达式匹配标签，一般用于子路由
+    #以正则表达式匹配标签
     match_re:
       service: mysql|cassandra
     #以标签来匹配
@@ -235,7 +287,55 @@ route:
 
 ```
 
-#### inhibit_rule
+### 路由树
+
+先看一下路由配置
+
+```yaml
+route:
+  receiver: default
+  routes:
+  - match:
+      service: database
+    receiver: a
+    routes:
+    - match:
+        owner: team-X
+      receiver: a1
+    - match:
+        owner: team-Y
+      receiver: a2
+      routes:
+      - match:
+          owner: ll
+        receiver: a2.1
+      - match:
+          owner: rr
+        receiver: a2.2
+  - match:
+    receiver: b
+  - match:
+    receiver: c
+    routes:
+    - match:
+      receiver: c1
+    - match:
+      receiver: c2
+
+```
+
+他的路由树就是
+
+![routetree](https://qiniu.li-rui.top/routetree.png)
+
+从上面可以见到，
+- 具有标签 service: database 的报警信息会流向 receiver: a
+- 具有标签 service: database owner: team-X 的报警信息会流向 receiver: a1
+- 具有标签 service: database owner: team-Y 的报警信息会流向 receiver: a2 
+- 具有标签 service: database owner: team-Y owner: ll 的报警信息会流向 receiver: a2.1
+- 具有标签 service: database owner: team-Y owner: rr 的报警信息会流向 receiver: a2.2
+
+## inhibit_rule
 
 用来配置将一些报警抑制
 
@@ -256,7 +356,7 @@ source_match_re:
 [ equal: '[' <labelname>, ... ']' ]
 ```
 
-#### receiver
+## receiver
 
 定义出多种发送器配置
 
@@ -285,7 +385,7 @@ wechat_configs:
   [ - <wechat_config>, ... ]
 ```
 
-#### webhook_config
+## webhook_config
 
 着重来看一下webhook_config配置，报警信息会通过HTTP POST方式去向webhook发送信息
 
@@ -326,7 +426,37 @@ url: <string>
 }
 ```
 
-#### templates
+附上一个测试webhook的服务器代码，这里用python来搭建一个webhook测试服务器
+
+```python
+#/root/app.py
+from flask import Flask, request
+import json
+app = Flask(__name__)
+
+@app.route('/send', methods=['POST'])
+def send():
+    try:
+        data = json.loads(request.data)
+        alerts = data['alerts']
+        for i in alerts:
+            print(str(i))
+    except Exception as e:
+        print(e)
+    return 'ok'
+
+if __name__ == '__main__':
+    app.run("0.0.0.0")
+```
+
+使用docker运行
+
+```bash
+docker run --rm -p 5090:5000 --name app -v /root/app.py:/src/app.py jcdemo/flaskapp:latest
+```
+
+
+## templates
 
 究竟向接收器发送什么信息内容呢，这就需要定制一个信息的模板
 
@@ -349,7 +479,45 @@ templates:
 
 ```
 
-## docker启动
+模板使用
+
+```yaml
+{{ template "alert.html" . }}
+```
+
+也可以直接使用
+
+```yaml
+    annotations:
+      description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.'
+      summary: 'Instance {{ $labels.instance }} down'
+```
+
+# smtp配置
+
+腾讯企业邮箱配置，需要注意的地方
+
+- 端口使用587 而不是 465 。587是STARTTLS协议的 属于TLS通讯协议 只是他是在STARTTLS命令执行后才对之后的原文进行保护。465端口是为SMTPS（SMTP-over-SSL）协议服务。alert需要使用587端口，走的STARTTLS协议
+- smtp_auth_password 需要用到客户端专用密码。这个需要在邮箱里面开启，否则会影响发信服务
+
+```yaml
+global:
+  smtp_smarthost: 'smtp.exmail.qq.com:587'
+  smtp_from: '##'
+  smtp_auth_username: '##'
+  smtp_auth_password: '##'
+  smtp_require_tls: true
+  resolve_timeout: 10s
+```
+
+如果没有配置客户端专用密码，会报错
+
+```bash
+evel=error ts=2019-04-30T06:33:39.542678243Z caller=dispatch.go:280 component=dispatcher msg="Notify for alerts failed" num_alerts=3 err="sending mail from: 501 ϵͳ\ufffd\ufffdǿ\ufffdƿ\ufffd\ufffd\ufffd\ufffdʺ\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdã\ufffd\ufffd\ufffd\ufffd\ufffd¼exmail.qq.com\ufffd\ufffd\ufffd\ufffd΢\ufffd\ufffd "
+level=error ts=2019-04-30T06:33:49.542821223Z caller=notify.go:332 component=dispatcher msg="Error on notify" err="sending mail from: 501 ϵͳ\ufffd\ufffdǿ\ufffdƿ\ufffd\ufffd\ufffd\ufffdʺ\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdã\ufffd\ufffd\ufffd\ufffd\ufffd¼exmail.qq.com\ufffd\ufffd\ufffd\ufffd΢\ufffd\ufffd "
+```
+
+# docker启动
 
 ```bash
 docker run --name alert --rm -d \
