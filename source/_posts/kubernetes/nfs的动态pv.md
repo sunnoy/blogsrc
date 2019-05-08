@@ -1,6 +1,6 @@
 ---
 title: pod中volumes挂载讨论
-date: 2019-05-05 12:12:28
+date: 2019-05-08 12:12:28
 tags:
 - kubernetes
 ---
