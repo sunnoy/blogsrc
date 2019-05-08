@@ -1,5 +1,5 @@
 ---
-title: pod中volumes挂载讨论
+title: nfs的动态pv
 date: 2019-05-08 12:12:28
 tags:
 - kubernetes
