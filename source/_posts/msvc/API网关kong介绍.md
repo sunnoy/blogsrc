@@ -2,7 +2,7 @@
 title: API网关kong介绍
 date: 2019-04-22 12:12:28
 tags:
-- kong
+- mesh
 ---
 
 # kong是什么
@@ -28,7 +28,9 @@ admin API 端口 admin部分
 
 # kong安装
 
-本文通过docker-compose进行安装，下面安装主要有下面几部分：
+## compose安装
+
+安装主要有下面几部分：
 
 - 安装postgres数据库
 - 使用kong容器进行数据库初始化
@@ -124,6 +126,15 @@ services:
       - kong-database
     ports:
       - "1337:1337"
+```
+
+## helm安装
+
+在kubernetes中分为有数据库和无数据库安装，这里选用无数据库安装
+
+```bash
+helm install ms/kong --name kong --set ingressController.enabled=true \
+  --set postgresql.enabled=false --set env.database=off
 ```
 
 # kong 组件

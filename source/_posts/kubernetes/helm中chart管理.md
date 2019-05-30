@@ -867,6 +867,12 @@ NAME             	CHART VERSION	APP VERSION	DESCRIPTION
 test/linkchart 	0.1.0        	1.0        	A Helm chart for Kubernetes linkchart
 ```
 
+# chart国内源
+
+```bash
+helm repo add ms http://mirror.azure.cn/kubernetes/charts/
+```
+
 
 
 
