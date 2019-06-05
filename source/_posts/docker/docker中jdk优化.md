@@ -89,5 +89,28 @@ docker run -d -m 800M  openjdk:10-jdk-alpine
 
 jdk相关版本对docker兼容的具体测试请参考[这篇博文](https://royvanrijn.com/blog/2018/05/java-and-docker-memory-limits/)
 
+### 检查
 
+```bash
+java -XX:+PrintFlagsFinal -version | grep MaxHeapSize
+java -XX:+PrintFlagsFinal -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -version | grep MaxHeapSize
+```
+
+# gradle编译配置
+
+项目根目录创建文件 build.gradle
+
+```bash
+#jvm参数
+org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+
+#在容器去掉daemon
+org.gradle.daemon=false
+```
+
+[配置文档](https://docs.gradle.org/current/userguide/build_environment.html#sec:configuring_jvm_memory)
+
+# 使用adoptopenjdk
+
+adoptopenjdk默认开启容器特性，[官方网站](https://adoptopenjdk.net/index.html?variant=openjdk8&jvmVariant=openj9)
 
