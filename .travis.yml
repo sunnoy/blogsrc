@@ -12,6 +12,7 @@ script:
   - cd ../../
   - hexo generate
   - echo "www.li-rui.top" > public/CNAME
+  - echo "google.com, pub-1534231526661590, DIRECT, f08c47fec0942fa0" > public/ads.txt
   - git config user.name "sunnoy"
   - git config user.email "${email}"
   - cd public
