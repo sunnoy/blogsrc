@@ -25,6 +25,23 @@ node上的资源在kubernetes中被分为
 这几种资源的关系是
 
 ```bash
+     Node Capacity
+---------------------------
+|     kube-reserved       |
+|-------------------------|
+|     system-reserved     |
+|-------------------------|
+|    eviction-threshold   |
+|-------------------------|
+|                         |
+|      allocatable        |
+|   (available for pods)  |
+|                         |
+|                         |
+---------------------------
+```
+
+```bash
 [Allocatable] = [Node Capacity] - [Kube-Reserved] - [System-Reserved] - [Hard-Eviction-Threshold]
 ```
 
@@ -34,6 +51,10 @@ node上的资源在kubernetes中被分为
 
 - --kube-reserved=cpu=500m,memory=5Mi --kube-reserved-cgroup
 - --system-reserved --system-reserved-cgroup
+- --eviction-hard=[memory.available<500Mi]
+- --enforce-node-allocatable=pods[,][system-reserved][,][kube-reserved]
+
+[详细请参考](https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/)
 
 # 容器资源请求
 
