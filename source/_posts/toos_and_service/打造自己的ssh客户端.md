@@ -2,7 +2,7 @@
 title: 打造自己的ssh客户端
 date: 2019-04-08 12:12:28
 tags:
-- linux
+- mac
 ---
 
 # 达到的效果
