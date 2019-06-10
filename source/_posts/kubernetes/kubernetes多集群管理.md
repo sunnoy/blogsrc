@@ -11,8 +11,8 @@ tags:
 
 # 所需工具
 
-- mac
-- zsh mac自带
+- [mac](https://www.apple.com/cn/macbook-pro/)
+- [zsh mac自带](https://www.zsh.org/)
 - [brew](https://brew.sh/)
 - [iterm2](https://www.iterm2.com/) 
 - [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh)
