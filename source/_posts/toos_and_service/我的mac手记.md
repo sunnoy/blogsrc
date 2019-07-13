@@ -33,3 +33,14 @@ http://www.hostbuf.com/t/988.html
 https://adobedownload.org/adobe-patcher-2019-zii-4-1-crack-any-adobe-softwares-on-mac/
 ```
 
+# 终端代理
+
+## zsh
+
+```bash
+vi ~/.zshrc
+alias proxy='export all_proxy=socks5://127.0.0.1:1086'
+alias unproxy='unset all_proxy'
+source ~/.zshrc
+```
+
