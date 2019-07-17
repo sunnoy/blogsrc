@@ -403,6 +403,56 @@ openssl pkcs12 -export -clcerts -in ./cert.pem -inkey ./key.pem -out ./client.p1
 
 导入后会让选择自己导入的客户端证书，然后输入自己的mac的认证信息，可以浏览了
 
+# gcr镜像
+
+微软中国提供
+
+[地址](http://mirror.azure.cn/help/gcr-proxy-cache.html)
+
+## 使用
+
+### gcr.io
+
+```bash
+# gcr
+docker pull gcr.io/spinnaker-marketplace/halyard:1.21.1
+# 镜像
+docker pull gcr.azk8s.cn/spinnaker-marketplace/halyard:1.21.1
+
+```
+
+### k8s.gcr.io
+
+```bash
+
+#k8s.gcr.io
+docker pull k8s.gcr.io/xxx:yyy
+#镜像
+docker pull gcr.azk8s.cn/google-containers/xxx:yyy
+
+```
+
+### quay.io
+
+```bash
+
+#quay.io
+docker pull quay.io/xxx/yyy:zzz
+#镜像
+docker pull quay.azk8s.cn/xxx/yyy:zzz
+```
+
+### dockerhub
+
+```bash
+# docker hub
+docker pull sunnoy/certbot:710
+# 镜像
+docker pull dockerhub.azk8s.cn/sunnoy/certbot:710
+```
+
+[具体使用](https://www.ilanni.com/?p=14534)
+
 
 
 

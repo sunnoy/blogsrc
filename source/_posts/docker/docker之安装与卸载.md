@@ -7,6 +7,12 @@ tags:
 
 # docker之安装与卸载
 
+# 安装脚本
+
+```bash
+curl -skSL https://mirror.azure.cn/repo/install-docker-ce.sh | sh -s -- --mirror AzureChinaCloud
+```
+
 ## 1.1 在线安装docker
 
 ### 卸载旧的docker
