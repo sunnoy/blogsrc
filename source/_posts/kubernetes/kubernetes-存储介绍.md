@@ -22,7 +22,7 @@ kubernetes对存储做了一层封装，核心实现下面三个功能
 - PV/PVC Controller 做存储资源的生命周期管理 运行中master上
 - Attach/Detach 做使用者和提供者的解偶 运行在master上
 
-![architecture-v1](https://qiniu.li-rui.top/architecture-v1.jpg)
+![deploy-art](https://qiniu.li-rui.top/deploy-art.png)
 
 对与操作attach/detach，kubernetes提供了两种实现方式
 
@@ -31,9 +31,11 @@ kubernetes对存储做了一层封装，核心实现下面三个功能
 
 ## 存储中的六种操作
 
-- provision/delete 创建存储资源
-- attach/detach 将存储资源放入集群
-- mount/unmount 将存储资源和容器绑定
+如果要在容器进行数据持久化
+
+- provision/delete 创建磁盘
+- attach/detach 将磁盘挂载到node上，进行格式化
+- mount/unmount 对格式化的磁盘进行挂载到容器中
 
 
 # kubernetes存储插件类型
