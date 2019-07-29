@@ -11,7 +11,7 @@ pod使用卷是需要首先创建volumes然后在容器中进行引用，整体�
 
 <!--more-->
 
-#首先定义卷
+# 首先定义卷
 
 卷的后端有很多中，configmap是一种，也可以使用宿主机的文件
 
@@ -102,20 +102,46 @@ yum
 ## 只挂载单个文件
 
 ```yaml
-          #需要指定出文件名称，不然会报错，文件名称可以和subPath不一样
-          mountPath: /var/spool/my.cnf
-          #这里只写出需要挂载的文件名
-          subPath: my.cnf
+apiVersion: v1
+data:
+  game.properties: |
+    enemies=aliens
+    lives=3
+  ui.properties: |
+    color.good=purple
+    color.bad=yellow
+
+kind: ConfigMap
+metadata:
+  name: test
+  namespace: default
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      volumeMounts:
+      - name: config-volume
+        mountPath: /etc/nginx/game.properties
+        subPath: game.properties
+      - name: config-volume
+        mountPath: /etc/nginx/ui.properties
+        subPath: ui.properties
+  volumes:
+    - name: config-volume
+      configMap:
+        name: test
+        items:
+        - key: game.properties
+          path: game.properties
+        - key: ui.properties
+          path: ui.properties
 ```
 
-上述挂载完成后就是
-
-```bash
-ls spool
-
-nginx.conf
-my.cnf
-```
 
 
 
