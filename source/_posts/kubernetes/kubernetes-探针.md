@@ -13,7 +13,7 @@ kubernetes中对应用进行健康检查的一种手段，为了调用该服务�
 
 # 探针类型
 
-- Liveness 是否在运行，防止存在死锁，一旦发生死锁就会重启重启
+- Liveness 是否在运行，防止存在死锁，一旦发生死锁就会重启容器
 - Readiness 是否可以接受请求访问，一旦发生无法访问将从service的后端endpoint列表中剔除，pod为notready
 
 # 公用参数
