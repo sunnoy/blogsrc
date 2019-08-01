@@ -1,6 +1,6 @@
 ---
 title: pod中volumes挂载讨论
-date: 2019-04-07 12:12:28
+date: 2019-07-31 12:12:28
 tags:
 - kubernetes
 ---
@@ -100,6 +100,8 @@ yum
 ```
 
 ## 只挂载单个文件
+
+**这种方式configmap不会更新**
 
 ```yaml
 apiVersion: v1
