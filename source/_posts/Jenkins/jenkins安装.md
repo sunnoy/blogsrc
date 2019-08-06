@@ -48,3 +48,25 @@ https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
 配置插件地址
 
 ![配置](https://qiniu.li-rui.top/配置.png)
+
+# helm安装
+
+```yaml
+master:
+  imagePullPolicy: IfNotPresent
+  adminPassword: xylink
+  serviceType: NodePort
+  nodePort: 32000
+  slaveKubernetesNamespace: kubernetes-plugin
+  javaOpts: -Dhudson.slaves.NodeProvisioner.initialDelay -Dhudson.slaves.NodeProvisioner.MARGIN=50 -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
+  tolerations:
+    - key: "kubernetes.io/master"
+      operator: "Equal"
+      value: "value"
+      effect: "NoSchedule"
+  nodeSelector:
+    kubernetes.io/role: master
+  persistence:
+    storageClass: nfs-client
+    size: 5Gi
+```

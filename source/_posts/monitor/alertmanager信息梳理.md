@@ -21,10 +21,6 @@ prom会根据规则去触发报警消息，然后将消息发送到alermanager
 
 # 信息流
 
-## 总流程
-
-![报警流程](https://qiniu.li-rui.top/报警流程.png)
-
 ## alertmanger
 
 ![alert-art](https://qiniu.li-rui.top/alert-art.png)
@@ -46,6 +42,10 @@ prom会根据规则去触发报警消息，然后将消息发送到alermanager
 - 针对group
 - group_wait 为初始发送缓存
 - group_interval 改组已经发送过报警了，新来报警发送间隔
+
+## 分组与路由
+
+报警信息来了以后是先路由，然后进行分组，接着进行group_wait group_interval相关参数的配置生效
 
 # 报警抑制
 
