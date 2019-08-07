@@ -99,6 +99,40 @@ nginx.conf
 yum
 ```
 
+## configmap默认直接挂载到目录
+
+configmap中的多个key就会称为挂载目录内的文件
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: special-config
+  namespace: default
+data:
+  SPECIAL_LEVEL: very
+  SPECIAL_TYPE: charm
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dapi-test-pod
+spec:
+  containers:
+    - name: test-container
+      image: nginx
+      volumeMounts:
+      - name: config-volume
+        mountPath: /etc/dong
+  volumes:
+    - name: config-volume
+      configMap:
+        name: special-config
+  restartPolicy: Never
+```
+
+/etc/dong这个目录没有会自动创建，在dong的路径下会有SPECIAL_LEVEL和SPECIAL_TYPE两个文件，文件内容是configmap中定义的内容。
+
 ## 只挂载单个文件
 
 **这种方式configmap不会更新**
@@ -143,6 +177,7 @@ spec:
         - key: ui.properties
           path: ui.properties
 ```
+
 
 
 
