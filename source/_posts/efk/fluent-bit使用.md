@@ -1,5 +1,5 @@
 ---
-title: fluent-bit中sidecar采集
+title: fluent-bit使用
 date: 2019-8-7 12:12:28
 tags:
 - efk
