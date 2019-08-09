@@ -51,26 +51,6 @@ http {
 通过监测configmap挂载的目录，当有文件变动的时候就去执行一个web请求，进而触发相关的lua脚本
 
 ```yaml
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: openresty
-  namespace: default
-data:
-  up.conf: |
-    upstream backend {
-        server xxxxx.xxx.xxx;
-    }
-    server {
-        listen       80;
-        server_name  localhost;
-
-      location /oio {
-         proxy_pass http://backend;
-     }
-    }
-
 ---
 apiVersion: v1
 kind: Pod
@@ -79,25 +59,96 @@ metadata:
 spec:
   containers:
     - args:
-      - --volume-dir=/etc/config
-      - --webhook-url=http://127.0.0.1/reload
+      - --volume-dir=/etc/nginx/conf.d
+      - --webhook-url=http://127.0.0.1:1989/reload
       image: jimmidyson/configmap-reload:v0.2.2
       imagePullPolicy: IfNotPresent
       name: openresty-configmap-reload
       volumeMounts:
-      - mountPath: /etc/config
-        name: config-volume
+      - mountPath: /etc/nginx/conf.d
+        name: openresty-confd
         readOnly: true
     - name: nginx
       image: openresty/openresty:centos
       volumeMounts:
-      - name: config-volume
-        mountPath: /etc/nginx/conf.d/
+      - name: openresty-nginx
+        mountPath: /usr/local/openresty/nginx/conf/nginx.conf
+        subPath: nginx.conf
+      - name: openresty-confd
+        mountPath: /etc/nginx/conf.d
   volumes:
-    - name: config-volume
+    - name: openresty-confd
       configMap:
-        name: openresty
+        name: openresty-confd
+    - name: openresty-nginx
+      configMap:
+        name: openresty-nginx
         items:
-        - key: up.conf
-          path: up.conf
+        - key: nginx.conf
+          path: nginx.conf
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openresty-nginx
+  namespace: default
+data:
+  nginx.conf: |
+    user  root;
+    worker_processes  1;
+    error_log  logs/error.log;
+    events {
+        worker_connections  1024;
+    }
+    http {
+        include       mime.types;
+        default_type  application/octet-stream;
+        access_log  logs/access.log  main;
+        sendfile        on;
+        keepalive_timeout  65;
+        server {
+          listen       1989;
+          server_name  localhost;
+          location /reload {
+            content_by_lua 'os.execute("/usr/bin/openresty -s reload")';
+          }
+        }
+        include /etc/nginx/conf.d/*.conf;
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openresty-confd
+  namespace: default
+data:
+  upstream.conf: |
+    upstream kubernetes {
+      server kubernetes:443;
+    }
+
+  server.conf: |
+    server {
+      listen       80;
+      server_name  localhost;
+      proxy_http_version 1.1;
+      proxy_set_header Host $host:$server_port;
+      proxy_set_header X-Forwarded-Host $host:$server_port;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Port $server_port;
+      proxy_set_header X-Forwarded-Server $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Nginx-IP $server_addr;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection $connection_upgrade;
+
+      location = /favicon.ico {
+        return 404;
+      }
+
+      location / {
+        deny all;
+      }
+    }
 ```
