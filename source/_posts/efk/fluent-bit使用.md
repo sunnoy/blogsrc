@@ -156,10 +156,13 @@ Parser_Firstline 需要使用PARSER部分定义的解析器
 [INPUT]
     Name             tail
     Path             java.log
+    # Multiline on 的时候，使用Parser_Firstline
     Multiline        on
     Parser_Firstline docker1
     Parser_Firstline docker2
     Parser_Firstline docker3
+    # Multiline off (默认情况)使用
+    Parser
 ```
 解析配置文件：
 
@@ -179,4 +182,51 @@ Parser_Firstline 需要使用PARSER部分定义的解析器
 - Docker
 - Syslog rfc5424
 - Syslog rfc3164
+
+# 解析ngixn中access日志
+
+## 日志格式
+
+```bash
+127.0.0.1 50384 - [10/Aug/2019:08:34:54 +0000] "GET / HTTP/1.1" 73 403 159 "-" "curl/7.29.0" "-" conn = 1 conn_req=1 request_time = 0.000 upstream_connect_time=- upstream_header_time=- upstream_response_time = - upstream_addr=- upstream_status=-
+```
+
+## fluent bit配置
+
+```ini
+    [SERVICE]
+        Parsers_File parser-nginx.conf
+    [PARSER]
+        Name        ddnginx
+        Format      regex
+        Regex       ^(?<remote_addr>[^ ]*) (?<remote_port>[^ ]*) - \[(?<logtime>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<request_length>[^ ]*) (?<status>[^ ]*) (?<body_bytes_sent>[^ ]*) "(?<http_referer>[^\"]*)" "(?<http_user_agent>[^\"]*)" "(?<http_x_forwarded_for>[^\"]*)" conn = (?<conn>[^ ]*) conn_req=(?<conn_req>[^ ]*) request_time = (?<request_time>[^ ]*) upstream_connect_time=(?<upstream_connect_time>[^ ]*) upstream_header_time=(?<upstream_header_time>[^ ]*) upstream_response_time = (?<upstream_connect_time>[^ ]*) upstream_addr=(?<upstream_addr>[^ ]*) upstream_status=(?<upstream_status>[^ ]*)$
+        Time_Key    logtime
+        Time_Format %d/%m/%YT%H:%M:%S %z
+    [INPUT]
+        Name        tail
+        Path        /opt/access.log
+        Refresh_Interval 2
+        DB          /opt/access.db
+        Parser      ddnginx
+        Tag         nginx.access
+```
+
+## 正则解读
+
+```bash
+^(?<remote_addr>[^ ]*)
+
+^ 字符串开头
+
+(?<remote_addr>正则语句) 用来捕获正则语句匹配的字符串，给变量remote_addr
+
+[^ ] 里面有个空格，除了不是空格都匹配，[^"] 除了不是"都匹配
+
+* 可以是任意个字符串
+```
+
+## 正则表达式验证
+
+- http://fluentular.herokuapp.com/
+- https://rubular.com/
 
