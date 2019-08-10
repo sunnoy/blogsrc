@@ -4,6 +4,7 @@ date: 2019-7-22 12:12:28
 tags:
 - kubernetes
 ---
+
 # 介绍
 
 使用[kind](https://kind.sigs.k8s.io/docs/user/quick-start/)工具以容器的方式部署集群
