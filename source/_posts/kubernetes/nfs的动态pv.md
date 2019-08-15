@@ -26,7 +26,7 @@ Kubernetes NFS-Client Provisioner 只是一个对接nfs server和kubernets中pvc
 使用helm安装
 
 ```bash
-helm install stable/nfs-client-provisioner --set nfs.server=x.x.x.x --set nfs.path=/data/promd
+helm install --name nfs stable/nfs-client-provisioner --set nfs.server=x.x.x.x --set storageClass.defaultClass=true --set nfs.path=/xxx
 ```
 
 安装后查看
