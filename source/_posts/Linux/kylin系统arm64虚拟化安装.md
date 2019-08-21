@@ -143,7 +143,7 @@ virt-install \
 --disk path=/media/xylink/kylin-4-0-2-arm64.img \
 --ram 1024 \
 --memballoon model=virtio \
---cdrom /media/xylink/kylin-back.iso \
+--cdrom /media/Kylin-4.0.2-server-sp2-2000-19080415.Z1-arm64.iso \
 --graphics vnc,port=5916,listen='0.0.0.0' \
 --autostart --noautoconsole --os-type=linux 
 ```
@@ -174,7 +174,7 @@ systemctl restart networking
 ## 虚拟机内开机自启
 
 ```bash
-vi /etc/network/interfaces.d/br-wan
+vi /etc/network/interfaces.d/enp1s0
 
 ##########动态
 auto enp1s0
