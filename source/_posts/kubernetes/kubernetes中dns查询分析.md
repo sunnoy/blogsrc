@@ -170,3 +170,14 @@ tcpdump -vvv -n -i eth0 udp dst port 53 and host 172.77.2.120 -w dns
 ```
 
 ![dns查询](https://qiniu.li-rui.top/dns查询.png)
+
+# nginx的动态upstream解析问题
+
+nginx跑在k8s中以后配置upstream的时候需要补全search后的部分
+
+```bash
+resolver 10.68.0.2;
+location / {
+  set $myupstream xxx.xxx.svc.cluster.local.;
+  proxy_pass http://${myupstream}:444;
+```
