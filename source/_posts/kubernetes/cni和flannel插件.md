@@ -1,4 +1,4 @@
-Srtyuioppoiuyt---
+---
 title: cni和flannel插件
 date: 2019-08-13 12:12:28
 tags:
@@ -114,7 +114,11 @@ vxlan是一种基于udp的隧道封装协议
 }
 ```
 
-## 总流程
+
+
+# 总流程
+
+
 
 flannel CNI插件首先读取netconf配置和subnet.env信息，生成适用于bridge CNI插件的netconf文件和ipam（host-local）配置，并设置其delegate为bridge CNI插件。然后调用走bridge CNI插件挂载容器到bridge的流程。由于各个Pod的IP地址分配是基于host-local的Ipam，因此整个流程完全是分布式的，不会对API-Server造成太大的负担
 
