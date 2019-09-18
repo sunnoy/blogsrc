@@ -4,6 +4,7 @@ date: 2018-11-04 12:12:28
 tags:
 - jenkins
 ---
+
 ## jenkins安装
 
 ### 1. 环境安装
