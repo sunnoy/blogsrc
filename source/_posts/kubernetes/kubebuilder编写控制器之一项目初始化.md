@@ -3,6 +3,7 @@ title: kubebuilder编写控制器之一项目初始化
 date: 2019-09-28 12:12:28
 tags:
 - kubernetes
+- crd
 ---
 
 # kubebuilder介绍
