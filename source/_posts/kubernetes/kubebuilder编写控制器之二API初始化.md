@@ -1,6 +1,6 @@
 ---
 title: kubebuilder编写控制器之二API初始化
-date: 2019-09-28 12:12:28
+date: 2019-09-28 12:22:28
 tags:
 - kubernetes
 - crd
