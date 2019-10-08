@@ -139,6 +139,16 @@ func main() {
 
 ```
 
+# 代码生成
+
+下面风格的类似的注释用来自动生成代码
+
+```bash
++<tag_name>[=value] 格式的注释
+```
+
+[具体请参考](https://blog.openshift.com/kubernetes-deep-dive-code-generation-customresources/)
+
 
 
 
