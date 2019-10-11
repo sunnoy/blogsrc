@@ -1,6 +1,6 @@
 ---
-title: kubebuilder编写控制器之四认识控制器
-date: 2019-10-08 12:22:28
+title: kubebuilder编写控制器之五实现控制器
+date: 2019-10-09 12:22:28
 tags:
 - kubernetes
 - crd
