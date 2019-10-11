@@ -102,3 +102,87 @@ syncFrequency: 1m0s
 tlsCertFile: /etc/kubernetes/ssl/kubelet.pem
 tlsPrivateKeyFile: /etc/kubernetes/ssl/kubelet-key.pem
 ```
+
+# APIserver认证和授权
+
+## API server中的node认证
+
+由于APIserver开启了客户端证书认证，kubelet访问API server的时候需要带上客户端证书。
+
+需要注意的是，客户端证书请求中的CommonName 和 Organization 字段值在进行API server认证的时候会作为用户和用户组
+
+APIserver会从证书中提取user name做lease的租约对象的识别对象，因此每个node的证书都是不一样的。
+
+```json
+{
+  // system:node 用户组 后面接的是用户名
+  "CN": "system:node:xxxxxx",
+  "hosts": [
+    "127.0.0.1",
+    "xxxxxxx"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "HangZhou",
+      "L": "XS",
+      // 用户组
+      "O": "system:nodes",
+      "OU": "System"
+    }
+  ]
+}
+```
+也可以通过APIserver的参数来看
+
+```bash
+--client-ca-file string
+If set, any request presenting a client certificate signed by one of the authorities in the client-ca-file is authenticated with an identity corresponding to the CommonName of the client certificate.
+```
+
+## API server中的node授权
+
+apiserver需要启用node授权。node授权是比rbac更精细的授权策略，是专门为node这个对象适用的
+
+[详见](https://kubernetes.io/docs/reference/access-authn-authz/node/)
+
+```bash
+--authorization-mode=Node,RBAC
+```
+
+# kubelet的认证和授权
+
+kubelet会监听一个端口用来提供服务，比如容器日志查看以及监控指标获取。
+
+## 认证
+
+支持三种认证方式
+
+```yaml
+authentication:
+  anonymous:
+    enabled: false
+  webhook:
+    cacheTTL: 2m0s
+    enabled: true
+  x509:
+    clientCAFile: /etc/kubernetes/ssl/ca.pem
+```
+
+一般使用客户端证书认证
+
+## 授权
+
+kubelet有证书和webhook授权
+
+```yaml
+authorization:
+  mode: Webhook
+  webhook:
+    cacheAuthorizedTTL: 5m0s
+    cacheUnauthorizedTTL: 30s
+```
