@@ -177,7 +177,9 @@ authentication:
 
 ## 授权
 
-kubelet有证书和webhook授权
+### 使用webhook
+
+kubelet有证书和webhook授权，这里主要说明webhook授权
 
 ```yaml
 authorization:
@@ -186,3 +188,21 @@ authorization:
     cacheAuthorizedTTL: 5m0s
     cacheUnauthorizedTTL: 30s
 ```
+
+kubelet的webhook授权服务器是kube-apiserver，他会利用apiserver中的SubjectAccessReviewAPI来获取外部服务来请求kubelet的某些资源的具体权限
+
+```bash
+kubelet and extension API servers use this to determine user access to their own APIs.
+```
+
+### SelfSubjectAccessReview API
+
+SelfSubjectAccessReview 在APIserver中主要负责授权，属于authorization.k8s.io API 组。包含下面的几个资源
+
+- SubjectAccessReview - Access review for any user, not just the current one. Useful for delegating authorization decisions to the API server. For example, the kubelet and extension API servers use this to determine user access to their own APIs.
+- LocalSubjectAccessReview - Like SubjectAccessReview but restricted to a specific namespace.
+- SelfSubjectRulesReview - A review which returns the set of actions a user can perform within a namespace. Useful for users to quickly summarize their own access, or for UIs to hide/show actions.
+
+
+
+
