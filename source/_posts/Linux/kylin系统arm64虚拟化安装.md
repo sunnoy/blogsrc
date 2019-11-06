@@ -91,7 +91,9 @@ cp /etc/apt/sources.list /root/sources.list
 #导入本地配置源
 echo "deb file:///mnt juniper main" > /etc/apt/sources.list
 #更新源
-apt update
+apt-get clean
+apt-get update
+
 ```
 
 ## 基础包安装
@@ -99,10 +101,9 @@ apt update
 ## 安装包
 
 ```bash
-apt-get install qemu-* -y
-apt-get libvirt* -y
-apt-get install libvirt* - 
-apt install virt-manager -y
+apt-get install qemu-* -y --allow-unauthenticated
+apt-get install libvirt* -y --allow-unauthenticated 
+apt install virt-manager -y --allow-unauthenticated 
 ```
 
 ### libvirt配置
@@ -129,6 +130,7 @@ group = "root"
 dynamic_ownership = 0
 
 systemctl restart libvirtd
+
 ```
 
 # 安装虚拟机
@@ -152,11 +154,19 @@ virt-install \
 
 `virt-manager` 图形化安装即可
 
+### 远程连接
+
+```bash
+apt-get install ssh-askpass-gnome --no-install-recommends
+ln -s /data/vm /var/lib/libvirt/images
+```
+
 # 虚拟机配置
 
 ## 宿主机网桥
 
 ```bash
+apt-get install bridge-utils
 vi /etc/network/interfaces.d/br-wan
 
 auto br-wan
@@ -172,6 +182,20 @@ systemctl restart networking
 [网桥静态配置](https://www.linuxprobe.com/build-bridge-ubuntu.html)
 
 ## 虚拟机内开机自启
+
+### dhcp脚本
+
+```bash
+ip link set enp1s0 up
+dhclient
+cp /opt/interface/enp1s0bak /opt/interface/enp1s0
+ip=`ifconfig enp1s0 | grep "inet addr:" | awk '{print $2}' | cut -c 6-`
+sed -i "s/WANIP/$ip/g"  /opt/interface/enp1s0
+cp /opt/interface/enp1s0 /etc/network/interfaces.d/enp1s0
+rm -rf enp1s0
+systemctl restart networking
+```
+### 静态IP
 
 ```bash
 vi /etc/network/interfaces.d/enp1s0
