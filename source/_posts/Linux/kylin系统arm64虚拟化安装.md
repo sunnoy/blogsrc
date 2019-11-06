@@ -154,6 +154,18 @@ virt-install \
 
 `virt-manager` 图形化安装即可
 
+### vnc
+
+```bash
+# 安装vnc
+apt-get install vnc4server
+
+# 开启vnc服务
+# 接着输入一下密码就行了
+# 端口为590 开头
+vnc4server 
+```
+
 ### 远程连接
 
 ```bash
