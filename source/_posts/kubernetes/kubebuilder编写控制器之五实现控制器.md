@@ -55,6 +55,4 @@ import (
 
 ## Reconciler完善
 
-
-
-todo 需要更多代码
+[具体完善代码](https://github.com/sunnoy/CronJob/blob/master/controllers/cronjob_controller.go)
