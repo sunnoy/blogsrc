@@ -180,6 +180,8 @@ cattle-cluster-agent-6594d48478-44z24-ab0c16e6-db7a-11e9-8a8b-acde48001122-debug
 
 ## 自定义debug镜像
 
+### 共有镜像
+
 ```bash
 # sh 为在debug容器启动后执行的命令
 kubectl debug -n cattle-system cattle-cluster-agent-6594d48478-44z24  -a --image busybox sh
