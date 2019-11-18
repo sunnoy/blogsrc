@@ -113,9 +113,37 @@ sudo pip3 install django-filter
 ## 创建项目
 
 ```bash
-django-admin startproject tutorial
-cd tutorial
-django-admin startapp quickstart
+django-admin startproject mysite
+cd mysite
+python manage.py startapp polls
+
+mysite #外部文件夹名称无所谓是啥
+├── db.sqlite3
+├── manage.py
+├── mysite # 内部的mysite为包名称
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-37.pyc
+│   │   ├── settings.cpython-37.pyc
+│   │   ├── urls.cpython-37.pyc
+│   │   └── wsgi.cpython-37.pyc
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+└── polls 
+    ├── __init__.py
+    ├── __pycache__
+    │   ├── __init__.cpython-37.pyc
+    │   ├── urls.cpython-37.pyc
+    │   └── views.cpython-37.pyc
+    ├── admin.py
+    ├── apps.py
+    ├── migrations
+    │   └── __init__.py
+    ├── models.py
+    ├── tests.py
+    ├── urls.py
+    └── views.py
 
 ```
 

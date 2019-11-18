@@ -44,3 +44,9 @@ alias unproxy='unset all_proxy'
 source ~/.zshrc
 ```
 
+# brew国内源
+
+```bash
+https://mirror.tuna.tsinghua.edu.cn/help/homebrew/
+```
+
