@@ -238,7 +238,14 @@ func add(x, y int) int {
 }
 ```
 
-## 数组
+# go mod
+
+```bash
+go mod init 包名
+
+# 下载缺失的依赖
+go mod tidy
+```
 
 
 

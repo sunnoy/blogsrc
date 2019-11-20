@@ -27,6 +27,10 @@ kubebuilder是个二进制文件，跟随官方文档安装即可
 ```bash
 export GO111MODULE=on
 export GOPROXY=https://mirrors.aliyun.com/goproxy/
+export GOPROXY=https://goproxy.cn,direct
+
+# 或者
+go env -w GOPROXY=https://goproxy.cn,direct
 
 mkdir CronJob
 cd CronJob
