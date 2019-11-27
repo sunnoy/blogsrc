@@ -327,6 +327,28 @@ bind_port = 6000
 ssh -oPort=6000 test@127.0.0.1
 ```
 
+# 命令行使用
+
+```bash
+frps \
+    --bind_addr 0.0.0.0 \
+    --bind_port 1989 \
+    --dashboard_addr 0.0.0.0 \
+    --dashboard_port 1990 \
+    --dashboard_pwd stest \
+    --dashboard_user admin \
+    --token stest
+
+./frpc tcp \
+    --local_port 22 \
+    --proxy_name kylin \
+    --server_addr xxx.xx.xx.xx:1989 \
+    --remote_port 1991 \
+    --token stest \
+    --uc \
+    --ue
+```
+
 
 
 
