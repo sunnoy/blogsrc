@@ -1,5 +1,5 @@
 ---
-title: kubernetes中fluentd部署
+title: loki轻量的日志聚合工具
 date: 2019-11-26 12:12:28
 tags:
 - efk
@@ -102,6 +102,3 @@ services:
     networks:
       - loki
 ```
-
-# fluentd集成
-
