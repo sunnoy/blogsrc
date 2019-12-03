@@ -399,3 +399,14 @@ stage('Parallel Stage') {
         }
 
 ```
+
+# 构建历史自动清除
+
+```bash
+pipeline {
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
+  }
+  ...
+}
+```
