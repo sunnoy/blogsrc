@@ -11,6 +11,12 @@ pidstat用来统计进程的信息
 
 <!--more-->
 
+# 安装
+
+```bash
+yum install sysstat -y
+```
+
 # 使用
 
 ## 看进程
