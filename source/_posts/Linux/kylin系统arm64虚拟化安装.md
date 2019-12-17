@@ -144,6 +144,7 @@ virt-install \
 --name kvm0 \
 --disk path=/media/xylink/kylin-4-0-2-arm64.img \
 --ram 1024 \
+--network bridge=br-wan \
 --memballoon model=virtio \
 --cdrom /media/Kylin-4.0.2-server-sp2-2000-19080415.Z1-arm64.iso \
 --graphics vnc,port=5916,listen='0.0.0.0' \
