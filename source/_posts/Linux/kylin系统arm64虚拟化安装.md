@@ -61,6 +61,9 @@ Flags:                 fp asimd evtstrm crc32
 uname -a
 Linux Kylin 4.4.131-20190726.kylin.server-generic #kylin SMP Tue Jul 30 16:44:09 CST 2019 aarch64 aarch64 aarch64 GNU/Linux
 
+# 乌班图
+16.04
+
 #系统
 cat /etc/.kyinfo
 
@@ -103,7 +106,8 @@ apt-get update
 ```bash
 apt-get install qemu-* -y --allow-unauthenticated
 apt-get install libvirt* -y --allow-unauthenticated 
-apt install virt-manager -y --allow-unauthenticated 
+apt-get install virt-manager -y --allow-unauthenticated
+
 ```
 
 ### libvirt配置
@@ -159,7 +163,7 @@ virt-install \
 
 ```bash
 # 安装vnc
-apt-get install vnc4server
+apt-get install tiger
 
 # 开启vnc服务
 # 接着输入一下密码就行了
@@ -170,6 +174,7 @@ vnc4server
 ### 远程连接
 
 ```bash
+# 可能需要外网
 apt-get install ssh-askpass-gnome --no-install-recommends
 ln -s /data/vm /var/lib/libvirt/images
 ```
@@ -183,8 +188,12 @@ apt-get install bridge-utils
 vi /etc/network/interfaces.d/br-wan
 
 auto br-wan
-iface br-wan inet dhcp
-        bridge_ports enp11s0f0
+iface br-wan inet static
+        address xxxx
+        netmask 255.255.254.0
+        gateway xxxxxxx
+        dns-nameservers 114.114.114.114
+        bridge_ports enp5s0f3
         bridge_stp off
         bridge_fd 0
         bridge_maxwait 0
@@ -226,6 +235,10 @@ gateway 172.17.1x.254
 dns-nameserver 1x.17.x.x
 
 systemctl restart networking
+
+#####开机启动
+
+auto enp1s0
 ```
 
 ## 虚拟机国内源
@@ -233,61 +246,14 @@ systemctl restart networking
 ```bash
 vi /etc/apt/sources.list
 
-
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-backports main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-proposed main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-security main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-updates main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-backports main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-proposed main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-security main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-updates main multiverse restricted universe
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ xenial main multiverse restricted universe
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ xenial-security main multiverse restricted universe
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ xenial-updates main multiverse restricted universe
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ xenial-backports main multiverse restricted universe
-deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ xenial main multiverse restricted universe
-deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ xenial-security main multiverse restricted universe
-deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ xenial-updates main multiverse restricted universe
-deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ xenial-backports main multiverse restricted universe
-deb http://mirrors.aliyun.com/ubuntu-ports/ xenial main
-deb-src http://mirrors.aliyun.com/ubuntu-ports/ xenial main
-
-deb http://mirrors.aliyun.com/ubuntu-ports/ xenial-updates main
-deb-src http://mirrors.aliyun.com/ubuntu-ports/ xenial-updates main
-
-deb http://mirrors.aliyun.com/ubuntu-ports/ xenial universe
-deb-src http://mirrors.aliyun.com/ubuntu-ports/ xenial universe
-deb http://mirrors.aliyun.com/ubuntu-ports/ xenial-updates universe
-deb-src http://mirrors.aliyun.com/ubuntu-ports/ xenial-updates universe
-
-deb http://mirrors.aliyun.com/ubuntu-ports/ xenial-security main
-deb-src http://mirrors.aliyun.com/ubuntu-ports/ xenial-security main
-deb http://mirrors.aliyun.com/ubuntu-ports/ xenial-security universe
-deb-src http://mirrors.aliyun.com/ubuntu-ports/ xenial-security universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ trusty main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ trusty-backports main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ trusty-proposed main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ trusty-security main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ trusty-updates main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ trusty main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ trusty-backports main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ trusty-proposed main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ trusty-security main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ trusty-updates main multiverse restricted universe
-deb [arch=armhf] https://download.docker.com/linux/ubuntu trusty stable
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-backports main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-proposed main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-security main multiverse restricted universe
-deb http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-updates main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-backports main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-proposed main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-security main multiverse restricted universe
-deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/ xenial-updates main multiverse restricted universe
+deb http://mirrors.aliyun.com/ubuntu-ports/ bionic main restricted universe multiverse
+# deb-src http://mirrors.aliyun.com/ubuntu-ports/ bionic main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu-ports/ bionic-updates main restricted universe multiverse
+# deb-src http://mirrors.aliyun.com/ubuntu-ports/ bionic-updates main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu-ports/ bionic-backports main restricted universe multiverse
+# deb-src http://mirrors.aliyun.com/ubuntu-ports/ bionic-backports main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu-ports/ bionic-security main restricted universe multiverse
+# deb-src http://mirrors.aliyun.com/ubuntu-ports/ bionic-security main restricted universe multiverse
 ```
 
 
