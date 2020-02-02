@@ -314,5 +314,32 @@ http {
 }
 ```
 
+# 环境变量
+
+```bash
+# 版本号可以自己根据项目的版本修改
+Version=1.5.6
+
+# MySQL
+DB_HOST=mmmmmm
+DB_PORT=3306
+DB_USER=jumpserver
+DB_PASSWORD=mmmmmm
+DB_NAME=jumpserver
+
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD=mmmm
+
+# Core
+SECRET_KEY=mmmmmm
+BOOTSTRAP_TOKEN=mmmmm
+
+##
+# SECRET_KEY 保护签名数据的密匙, 首次安装请一定要修改并牢记, 后续升级和迁移不可更改, 否则将导致加密的数据不可解密。
+# BOOTSTRAP_TOKEN 为组件认证使用的密钥, 仅组件注册时使用。组件指 koko、guacamole
+```
+
 
 
