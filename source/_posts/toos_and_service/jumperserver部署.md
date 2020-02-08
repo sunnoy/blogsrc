@@ -341,5 +341,52 @@ BOOTSTRAP_TOKEN=mmmmm
 # BOOTSTRAP_TOKEN 为组件认证使用的密钥, 仅组件注册时使用。组件指 koko、guacamole
 ```
 
+# 关于升级
+
+## 前提
+
+jumperserver本身已经做好了数据库的相关更改，这依赖与djanggo的数据库迁移功能
+
+## 迁移升级
+
+适用与迁移部署然后升级场景，应该先使用老版本在新的环境部署，然后升级
+
+## 核心步骤
+
+- 在新的环境部署好和老版本一样的版本的应用
+- 数据库导出
+
+```bash
+mysqldump -uroot -p jumpserver > /opt/jumpserver.sql
+```
+- 数据库导入
+
+```bash
+docker run --rm -it -v /root:/root mysql:5.7 bash
+cd 
+mysql -h rm-xxxxxxxxxx.mysql.rds.aliyuncs.com -u jumpserver -pxxxxxxx
+
+use jumper;
+source jumpserver.sql;
+```
+
+- 启动就版本的jumperserver
+
+- 将新的jumperserver镜像tag进行替换
+
+- 启动新的服务，就升级完成
+
+## 环境清理
+
+```bash
+rm -rf /opt/data-jump/koko1/.access_key
+rm -rf /opt/data-jump/koko2/.access_key
+rm -rf /opt/data-jump/koko3/.access_key
+rm -rf /opt/data-jump/koko4/.access_key
+rm -rf /opt/data-jump/core/static/*
+rm -rf /opt/data-jump/core/media/*
+```
+
+
 
 
