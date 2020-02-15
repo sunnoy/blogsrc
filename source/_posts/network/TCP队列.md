@@ -70,6 +70,65 @@ min(backlog, /proc/sys/net/core/somaxconn )
 # 1 发送rst
 ```
 
+# nginx的设置
+
+```bash
+listen 后面
+```
+
+# 建立连接的重试
+
+```bash
+net.ipv4.tcp_synack_retries #内核放弃连接之前发送SYN+ACK包的数量
+net.ipv4.tcp_syn_retries #内核放弃建立连接之前发送SYN包的数量
+``
+
+# syncookies开启的情况
+net.ipv4.tcp_syncookies=1
+
+#SYNcookie就是将连接信息编码在ISN(initialsequencenumber)中返回给客户端，这时server不需要将半连接保存在队列中，而是利用客户端随后发来的ACK带回的ISN还原连接信息，以完成连接的建立，避免了半连接队列被攻击SYN包填满。
+
+# 
+```
+
+# 半连接队列满了
+
+对于SYN半连接队列的大小是由（/proc/sys/net/ipv4/tcp_max_syn_backlog）这个内核参数控制的，有些内核似乎也受listen的backlog参数影响，取得是两个值的最小值。当这个队列满了，不开启syncookies的时候，Server会丢弃新来的SYN包，而Client端在多次重发SYN包得不到响应而返回（connection time out）错误。但是，当Server端开启了syncookies=1，那么SYN半连接队列就没有逻辑上的最大值了，并且/proc/sys/net/ipv4/tcp_max_syn_backlog设置的值也会被忽略。
+
+Client端在多次重发SYN包得不到响应而返回connection time out错误
+
+# 全连接队列满了
+
+当accept队列满了之后，即使client继续向server发送ACK的包，也会不被响应，此时ListenOverflows+1，同时server通过/proc/sys/net/ipv4/tcp_abort_on_overflow来决定如何返回，0表示直接丢弃该ACK，1表示发送RST通知client；相应的，client则会分别返回read timeout 或者 connection reset by peer。
+
+client则会分别返回read timeout 或者 connection reset by peer
+
+## 对半连接的影响
+
+```c
+    /*tcp_syncookies为2 进行syn cookie
+      tcp_syncookies为1 且request队列满了 进行syn cookie处理
+      tcp_syncookies为0 且request队列满了 将该syn报文drop掉*/
+```
+
+## 后续处理
+
+```bash
+cat /proc/sys/net/ipv4/tcp_abort_on_overflow
+
+#0 表示server drop掉客户端的ack 
+#1 表示server发送rst给客户端
+```
+
+
+# 参考文章
+
+```bash
+https://segmentfault.com/a/1190000008224853
+http://jm.taobao.org/2017/05/25/525-1/
+```
+
+
 
 
 
