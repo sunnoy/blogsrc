@@ -89,6 +89,9 @@ PROMPT=$PROMPT'$(kube_ps1)'
 
 ```bash
 brew install kubectx
+
+# 自动完成插件在
+/usr/local/share/zsh/site-functions
 ```
 
 # 集群切换
