@@ -387,6 +387,14 @@ rm -rf /opt/data-jump/core/static/*
 rm -rf /opt/data-jump/core/media/*
 ```
 
+# 迁移版本
+
+先导入老版本的mysql数据
+
+然后进行新版本的django数据架构迁移即可
+
+不要直接将老版本的数据直接放到新的版本里面，需要走软件自己的升级逻辑
+
 
 
 
