@@ -26,8 +26,8 @@ devices:
   - /dev/sdb
   - /dev/sdc
   - /dev/sdd
-monitor_address: 172.20.1.101
-radosgw_address: 172.16.1.101
+monitor_address: 173.20.1.101
+radosgw_address: 173.16.1.101
 ```
 
 ### 操作
@@ -93,7 +93,7 @@ hosts:
 {% if item.value.ceph_mon %}
 {% for kk, vv in stuff.ansible_facts.iteritems()  %}
 {%if item.key == kk %} 
-monitor_address: 172.20.1.{{ vv }}
+monitor_address: 173.20.1.{{ vv }}
 {% endif %}
 {% endfor %} 
 {% endif %}

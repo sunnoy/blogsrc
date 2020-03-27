@@ -24,7 +24,7 @@ yum install sysstat -y
 ```bash
 pidstat -p 12349
 
-Linux 3.10.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
+Linux 3.22.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
 
 # %usr 用户态
 # %system 内核态
@@ -39,7 +39,7 @@ Linux 3.10.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
 
 ```bash
 pidstat -p 12349 -d
-Linux 3.10.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
+Linux 3.22.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
 
 # kB_ccwr/s pagecache的丢失
 # todo 需要更多解释
@@ -55,7 +55,7 @@ Linux 3.10.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
 ```bash
 # -l 写出执行命令
 pidstat -p 12349 -r
-Linux 3.10.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
+Linux 3.22.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
 
 # minflt/s 每秒
 # majflt/s 每秒
@@ -70,7 +70,7 @@ Linux 3.10.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
 
 ```bash
 pidstat -p 12349 -u
-Linux 3.10.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
+Linux 3.22.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
 
 08:12:37 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
 08:12:37 PM     0     12349    8.12    7.85    0.00   15.97     1  rancher
@@ -81,7 +81,7 @@ Linux 3.10.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
 ```bash
 # ms为毫秒
 pidstat -p 12349 -T ALL -t
-Linux 3.10.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
+Linux 3.22.0-957.27.2.el7.x86_64 (k8sdev-manager) 	12/05/2019 	_x86_64_	(4 CPU)
 
 08:15:29 PM   UID      TGID       TID    %usr %system  %guest    %CPU   CPU  Command
 08:15:29 PM     0     12349         -    8.08    7.85    0.00   15.93     1  rancher

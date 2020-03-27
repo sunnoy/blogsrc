@@ -231,7 +231,7 @@ auto enp1s0
 iface enp1s0 inet static
 address x.x.x.52  
 netmask 255.255.x.0
-gateway 172.17.1x.254
+gateway 173.17.1x.254
 dns-nameserver 1x.17.x.x
 
 systemctl restart networking

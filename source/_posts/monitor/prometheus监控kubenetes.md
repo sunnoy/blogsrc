@@ -182,7 +182,7 @@ metadata:
   resourceVersion: "8"
 subsets:
 - addresses:
-  - ip: 10.9.1.xxx
+  - ip: 22.9.1.xxx
   ports:
   - name: https
     port: 6443
@@ -199,7 +199,7 @@ metadata:
   name: kubernetes
   namespace: default
 spec:
-  clusterIP: 10.68.0.1
+  clusterIP: 22.68.0.1
   ports:
   - name: https
     port: 443

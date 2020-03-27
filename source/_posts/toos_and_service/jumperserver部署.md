@@ -76,7 +76,7 @@ services:
     #   - 2222:2222
     networks:
       jumpserver:
-        ipv4_address: 10.10.10.11
+        ipv4_address: 22.22.22.11
 
   koko2:
     image: wojiushixiaobai/jms_koko:${Version}
@@ -96,7 +96,7 @@ services:
     #   - 2222:2222
     networks:
       jumpserver:
-        ipv4_address: 10.10.10.12
+        ipv4_address: 22.22.22.12
 
   koko3:
     image: wojiushixiaobai/jms_koko:${Version}
@@ -116,7 +116,7 @@ services:
     #   - 2222:2222
     networks:
       jumpserver:
-        ipv4_address: 10.10.10.13
+        ipv4_address: 22.22.22.13
 
   koko4:
     image: wojiushixiaobai/jms_koko:${Version}
@@ -136,7 +136,7 @@ services:
     #   - 2222:2222
     networks:
       jumpserver:
-        ipv4_address: 10.10.10.14
+        ipv4_address: 22.22.22.14
 
   # guacamole:
   #   image: wojiushixiaobai/jms_guacamole:${Version}
@@ -188,7 +188,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 10.10.10.0/24
+        - subnet: 22.22.22.0/24
 
 ```
 

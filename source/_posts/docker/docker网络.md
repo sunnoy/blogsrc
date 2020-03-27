@@ -77,9 +77,9 @@ docker0         8000.024239d76759       no
 #docker会为每个网桥配置IP
 [root@docker-pcp ~]# ip a | grep br-
 5: br-be655f6e64de: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default
-    inet 172.19.0.1/16 brd 172.19.255.255 scope global br-be655f6e64de
+    inet 173.19.0.1/16 brd 173.19.255.255 scope global br-be655f6e64de
 6: br-b9e18f47b3bb: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default
-    inet 172.20.0.1/16 brd 172.20.255.255 scope global br-b9e18f47b3bb
+    inet 173.20.0.1/16 brd 173.20.255.255 scope global br-b9e18f47b3bb
 
 ```
 
@@ -100,8 +100,8 @@ docker0         8000.024239d76759       no
             "Options": {},
             "Config": [
                 {
-                    "Subnet": "172.19.0.0/16",
-                    "Gateway": "172.19.0.1"
+                    "Subnet": "173.19.0.0/16",
+                    "Gateway": "173.19.0.1"
                 }
             ]
         },
@@ -147,12 +147,12 @@ docker exec -it c1 sh
        valid_lft forever preferred_lft forever
 7: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue
     link/ether 02:42:ac:13:00:02 brd ff:ff:ff:ff:ff:ff
-    inet 172.19.0.2/16 brd 172.19.255.255 scope global eth0
+    inet 173.19.0.2/16 brd 173.19.255.255 scope global eth0
        valid_lft forever preferred_lft forever
 #查看路由
 # ip route
-default via 172.19.0.1 dev eth0
-172.19.0.0/16 dev eth0 scope link  src 172.19.0.2
+default via 173.19.0.1 dev eth0
+173.19.0.0/16 dev eth0 scope link  src 173.19.0.2
 
 #进入c2
 # docker exec -it c2 sh
@@ -164,13 +164,13 @@ default via 172.19.0.1 dev eth0
        valid_lft forever preferred_lft forever
 9: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue
     link/ether 02:42:ac:13:00:03 brd ff:ff:ff:ff:ff:ff
-    inet 172.19.0.3/16 brd 172.19.255.255 scope global eth0
+    inet 173.19.0.3/16 brd 173.19.255.255 scope global eth0
        valid_lft forever preferred_lft forever
 
 #查看路由
 / # ip route
-default via 172.19.0.1 dev eth0
-172.19.0.0/16 dev eth0 scope link  src 172.19.0.3
+default via 173.19.0.1 dev eth0
+173.19.0.0/16 dev eth0 scope link  src 173.19.0.3
 
 ```
 
@@ -183,8 +183,8 @@ c1和c2在同一个网络里面是可以通的，c2和c3在不同网络是不同
 ```bash
 #c1到c2
 / # ping c2
-PING c2 (172.19.0.3): 56 data bytes
-64 bytes from 172.19.0.3: seq=0 ttl=64 time=0.113 ms
+PING c2 (173.19.0.3): 56 data bytes
+64 bytes from 173.19.0.3: seq=0 ttl=64 time=0.113 ms
 
 #c1到c3
 / # ping c3
@@ -221,27 +221,27 @@ c2中加入了一块新的网卡，网卡和frontend的网桥绑定
        valid_lft forever preferred_lft forever
 9: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue
     link/ether 02:42:ac:13:00:03 brd ff:ff:ff:ff:ff:ff
-    inet 172.19.0.3/16 brd 172.19.255.255 scope global eth0
+    inet 173.19.0.3/16 brd 173.19.255.255 scope global eth0
        valid_lft forever preferred_lft forever
 13: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue
     link/ether 02:42:ac:14:00:03 brd ff:ff:ff:ff:ff:ff
-    inet 172.20.0.3/16 brd 172.20.255.255 scope global eth1
+    inet 173.20.0.3/16 brd 173.20.255.255 scope global eth1
        valid_lft forever preferred_lft forever
 #查看路由
 / # ip route
-default via 172.19.0.1 dev eth0
-172.19.0.0/16 dev eth0 scope link  src 172.19.0.3
-172.20.0.0/16 dev eth1 scope link  src 172.20.0.3
+default via 173.19.0.1 dev eth0
+173.19.0.0/16 dev eth0 scope link  src 173.19.0.3
+173.20.0.0/16 dev eth1 scope link  src 173.20.0.3
 
 #与c3和c1联通
 / # ping c3
-PING c3 (172.20.0.2): 56 data bytes
-64 bytes from 172.20.0.2: seq=0 ttl=64 time=0.136 ms
-64 bytes from 172.20.0.2: seq=1 ttl=64 time=0.099 ms
+PING c3 (173.20.0.2): 56 data bytes
+64 bytes from 173.20.0.2: seq=0 ttl=64 time=0.136 ms
+64 bytes from 173.20.0.2: seq=1 ttl=64 time=0.099 ms
 / # ping c1
-PING c1 (172.19.0.2): 56 data bytes
-64 bytes from 172.19.0.2: seq=0 ttl=64 time=0.123 ms
-64 bytes from 172.19.0.2: seq=1 ttl=64 time=0.064 ms
+PING c1 (173.19.0.2): 56 data bytes
+64 bytes from 173.19.0.2: seq=0 ttl=64 time=0.123 ms
+64 bytes from 173.19.0.2: seq=1 ttl=64 time=0.064 ms
 
 ```
 
@@ -276,8 +276,8 @@ br-be655f6e64de         8000.02420fe2ad3c       no              veth7c91340
             "Options": {},
             "Config": [
                 {
-                    "Subnet": "172.19.0.0/16",
-                    "Gateway": "172.19.0.1"
+                    "Subnet": "173.19.0.0/16",
+                    "Gateway": "173.19.0.1"
                 }
             ]
         },
@@ -293,14 +293,14 @@ br-be655f6e64de         8000.02420fe2ad3c       no              veth7c91340
                 "Name": "c2",
                 "EndpointID": "38eab6613bb71c93aa3d9acc3b6c60d636410b3fbd60203b73c3b19a5c16b197",
                 "MacAddress": "02:42:ac:13:00:03",
-                "IPv4Address": "172.19.0.3/16",
+                "IPv4Address": "173.19.0.3/16",
                 "IPv6Address": ""
             },
             "b8adc9330ca6be48131d73e0603ef984216de672d53a29b6c2e57f532b8142bb": {
                 "Name": "c1",
                 "EndpointID": "74acec1f5acc8686f057dc7595ea5ada9155303a25fa2e0f95332304c8333fce",
                 "MacAddress": "02:42:ac:13:00:02",
-                "IPv4Address": "172.19.0.2/16",
+                "IPv4Address": "173.19.0.2/16",
                 "IPv6Address": ""
             }
         },
@@ -327,7 +327,7 @@ PING 114.114.114.114 (114.114.114.114): 56 data bytes
 
 #### 容器的包出去
 ```bash
--A POSTROUTING -s 172.20.0.0/16 ! -o br-b9e18f47b3bb -j MASQUERADE
+-A POSTROUTING -s 173.20.0.0/16 ! -o br-b9e18f47b3bb -j MASQUERADE
 ```
 数据包从容器出来后进入到br-网桥，br-网桥根据目的地址去找宿主机的默认网关，从和默认网关相同网段接口出去的时候进行了SANT转换，然后进入下一跳路由。
 
@@ -350,11 +350,11 @@ docker run -itd --rm --name  tomcat01 -p 8080:8080 tomcat:latest
 
 ```bash
 #目的和源都是tomcat容器且端口是8080就进行SNAT转换，出包
--A POSTROUTING -s 172.17.0.2/32 -d 172.17.0.2/32 -p tcp -m tcp --dport 8080 -j MASQUERADE
-#外边访问主机8080的包都送到172.17.0.2:8080，来包
--A DOCKER ! -i docker0 -p tcp -m tcp --dport 8080 -j DNAT --to-destination 172.17.0.2:8080
+-A POSTROUTING -s 173.17.0.2/32 -d 173.17.0.2/32 -p tcp -m tcp --dport 8080 -j MASQUERADE
+#外边访问主机8080的包都送到173.17.0.2:8080，来包
+-A DOCKER ! -i docker0 -p tcp -m tcp --dport 8080 -j DNAT --to-destination 173.17.0.2:8080
 #允许网桥docker0上8080通过
--A DOCKER -d 172.17.0.2/32 ! -i docker0 -o docker0 -p tcp -m tcp --dport 8080 -j ACCEPT
+-A DOCKER -d 173.17.0.2/32 ! -i docker0 -o docker0 -p tcp -m tcp --dport 8080 -j ACCEPT
 ```
 
 ## 桥接方式和宿主机同网段
@@ -367,7 +367,7 @@ docker run -itd --rm --name  tomcat01 -p 8080:8080 tomcat:latest
 ip link add name pcp type bridge
 ip link set pcp up
 ip link set dev eth3 master pcp
-ip addr add 172.16.1.119/16 dev pcp
+ip addr add 173.16.1.119/16 dev pcp
 #删除网桥
 ip link delete pcp type bridge
 ```
@@ -375,14 +375,14 @@ ip link delete pcp type bridge
 ### docker创建桥接网络
 
 ```bash
-docker network create --subnet=172.16.0.0/16 --gateway=172.16.1.119 -o com.docker.network.bridge.name=pcp test
+docker network create --subnet=173.16.0.0/16 --gateway=173.16.1.119 -o com.docker.network.bridge.name=pcp test
 ```
 
 ### 启动容器测试
 
 ```bash
-docker run -itd --rm --name aa --network test  --ip 172.16.1.120 busybox
-docker run -itd --rm --name bb --network test  --ip 172.16.1.121 busybox
+docker run -itd --rm --name aa --network test  --ip 173.16.1.120 busybox
+docker run -itd --rm --name bb --network test  --ip 173.16.1.121 busybox
 ```
 
 ### 一次性脚本
@@ -390,7 +390,7 @@ docker run -itd --rm --name bb --network test  --ip 172.16.1.121 busybox
 ```bash
 host_net=eth3
 bri_name=pcp
-bri_ip=172.16.1.119
+bri_ip=173.16.1.119
 docker_net=app_net
 
 ip link add name $bri_name type bridge
@@ -398,7 +398,7 @@ ip link set $bri_name up
 ip link set dev $host_net master $bri_name
 ip addr add $bri_ip/16 dev $bri_name
  
-docker network create --subnet=172.16.0.0/16 --gateway=$bri_ip -o com.docker.network.bridge.name=$bri_name $docker_net
+docker network create --subnet=173.16.0.0/16 --gateway=$bri_ip -o com.docker.network.bridge.name=$bri_name $docker_net
 ```
 
 

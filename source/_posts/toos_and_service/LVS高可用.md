@@ -135,19 +135,19 @@ echo 0 > /proc/sys/net/ipv4/conf/eth1/send_redirects
 ```bash
 IPVSADM='/sbin/ipvsadm'
 $IPVSADM -C
-$IPVSADM -A -t 172.16.254.200:80 -s wrr
-$IPVSADM -a -t 172.16.254.200:80 -r 192.168.0.18:80 -m -w 1
-$IPVSADM -a -t 172.16.254.200:80 -r 192.168.0.28:80 -m -w 1
+$IPVSADM -A -t 173.16.254.200:80 -s wrr
+$IPVSADM -a -t 173.16.254.200:80 -r 192.168.0.18:80 -m -w 1
+$IPVSADM -a -t 173.16.254.200:80 -r 192.168.0.28:80 -m -w 1
 
 #######################
 也可以这样
 echo "
        -A -t 207.175.44.110:80 -s rr
-       -a -t 207.175.44.110:80 -r 192.168.10.1:80 -m
-       -a -t 207.175.44.110:80 -r 192.168.10.2:80 -m
-       -a -t 207.175.44.110:80 -r 192.168.10.3:80 -m
-       -a -t 207.175.44.110:80 -r 192.168.10.4:80 -m
-       -a -t 207.175.44.110:80 -r 192.168.10.5:80 -m
+       -a -t 207.175.44.110:80 -r 192.168.22.1:80 -m
+       -a -t 207.175.44.110:80 -r 192.168.22.2:80 -m
+       -a -t 207.175.44.110:80 -r 192.168.22.3:80 -m
+       -a -t 207.175.44.110:80 -r 192.168.22.4:80 -m
+       -a -t 207.175.44.110:80 -r 192.168.22.5:80 -m
        " | ipvsadm -R
 
 
@@ -186,10 +186,10 @@ echo "
 /etc/keepalived
 |-------keepalived.conf #主配置文件
 |-------host
-|-------|---172.17.2.236_80.conf #虚拟IP
-|-------|---172.17.2.236_80 #虚拟IP内的RS主机配置
-|-------|---|---172.18.2.198_8080.conf
-|-------|---|---172.18.2.97_8080.conf
+|-------|---173.17.2.236_80.conf #虚拟IP
+|-------|---173.17.2.236_80 #虚拟IP内的RS主机配置
+|-------|---|---173.18.2.198_8080.conf
+|-------|---|---173.18.2.97_8080.conf
 ```
 
 - 主配置文件**keepalived.conf**
@@ -204,8 +204,8 @@ echo "
 # peer_ip_wan，匹配接入ip
 # src_ip_lan，源内网ip
 # peer_ip_lan，匹配内网ip
-# virtual_ip_wan，虚拟接入ip，例如172.17.2.79
-# virtual_ip_lan，虚拟内网ip，例如172.18.2.79
+# virtual_ip_wan，虚拟接入ip，例如173.17.2.79
+# virtual_ip_lan，虚拟内网ip，例如173.18.2.79
 # virtual_maskint_wan，虚拟接入掩码位数
 # virtual maskint_lan，虚拟内网掩码位数
 #
@@ -236,10 +236,10 @@ vrrp_instance WAN_GATEWAY {
 	#发送VRRP报文的间隔，秒
     advert_int 3
 	#单薄IP也就是，发送VRRP报文的IP
-    unicast_src_ip 172.17.2.41
+    unicast_src_ip 173.17.2.41
     unicast_peer {
 	    #同一组的虚拟路由
-        172.17.2.79
+        173.17.2.79
     }
 	#认证方式，PASS密码认证
     authentication {
@@ -250,16 +250,16 @@ vrrp_instance WAN_GATEWAY {
 	#虚拟IP地址，对客户端暴露的地址
     virtual_ipaddress {
 	    #后面接网卡接口，label就是附着在前面的子网卡上
-        172.17.2.236/16 dev eth0 label eth0:1
+        173.17.2.236/16 dev eth0 label eth0:1
     }
 	#当虚拟IP飘过来时，进行的动作脚本，一个同步组内只需要定义一个
 	#此为推送到业务平台进行更改显示状态，并且写入日志
     notify_master "/bin/bash /opt/lvs/scripts/change_master.sh"
 	#脚本内容
 	#!/bin/bash
-	#curl -X PUT -H "Content-Type: application/json" -d '{"switch_lvs_role":{"current_master_extranet_ip": "172.17.2.41", "current_slave_extranet_ip": "172.17.2.79", "vip_extranet":"172.17.2.236", "vip_intranet":"172.18.2.236"}}' 'http://172.17.1.5:38085/restfulapi/v2/lvs/operate?key=pc.zzidc.com&secret=A-quick-brown-fox-jumps-over-the-lazy-dog.'
+	#curl -X PUT -H "Content-Type: application/json" -d '{"switch_lvs_role":{"current_master_extranet_ip": "173.17.2.41", "current_slave_extranet_ip": "173.17.2.79", "vip_extranet":"173.17.2.236", "vip_intranet":"173.18.2.236"}}' 'http://173.17.1.5:38085/restfulapi/v2/lvs/operate?key=pc.zzidc.com&secret=A-quick-brown-fox-jumps-over-the-lazy-dog.'
 
-	#echo "172.17.2.41 change to master at `date '+%Y-%m-%d %H:%M:%S'`" >> /var/log/lvs.log
+	#echo "173.17.2.41 change to master at `date '+%Y-%m-%d %H:%M:%S'`" >> /var/log/lvs.log
 
 }
 vrrp_instance LAN_GATEWAY {
@@ -269,16 +269,16 @@ vrrp_instance LAN_GATEWAY {
     priority 100
     nopreempt
     advert_int 3
-    unicast_src_ip 172.18.2.41
+    unicast_src_ip 173.18.2.41
     unicast_peer {
-        172.18.2.79
+        173.18.2.79
     }
     authentication {
         auth_type PASS
         auth_pass gainet51
     }
     virtual_ipaddress {
-        172.18.2.236/16 dev eth1 label eth1:1
+        173.18.2.236/16 dev eth1 label eth1:1
     }
 }
 
@@ -288,13 +288,13 @@ include /etc/keepalived/hosts/*.conf
 
 ```
 
-- VIP虚拟服务配置文件**172.17.2.236_80.conf**
+- VIP虚拟服务配置文件**173.17.2.236_80.conf**
 
 
 ```bash
 #指定虚拟服务器，IP+空格+端口
-#就是ipvsadm -A -t 172.17.2.236:80 -s rr
-virtual_server  172.17.2.236 80 {
+#就是ipvsadm -A -t 173.17.2.236:80 -s rr
+virtual_server  173.17.2.236 80 {
     #服务健康检查周期，秒
 	delay_loop 6
 	#调度算法
@@ -308,21 +308,21 @@ virtual_server  172.17.2.236 80 {
     #转发协议
 	protocol TCP
     #包含后端服务器
-    include /etc/keepalived/hosts/172.17.2.236_80/*.conf
+    include /etc/keepalived/hosts/173.17.2.236_80/*.conf
 }
 
 ```
 
-- RS主机配置文件**172.18.2.198_8080.conf**
+- RS主机配置文件**173.18.2.198_8080.conf**
 
 ```bash
 #后端服务器
-#就是ipvsadm -a -t 172.17.2.236:80 -r 172.18.2.198:8080 -w 1
-real_server 172.18.2.198 8080 {
+#就是ipvsadm -a -t 173.17.2.236:80 -r 173.18.2.198:8080 -w 1
+real_server 173.18.2.198 8080 {
     #后端服务器健康检查  成功  时的脚本，后面接脚本中定义的五个变量赋值
-	notify_up "/bin/bash /opt/lvs/scripts/rs_state_change.sh 172.17.2.236 172.18.2.198 1 80 8080"
+	notify_up "/bin/bash /opt/lvs/scripts/rs_state_change.sh 173.17.2.236 173.18.2.198 1 80 8080"
     #后端服务器健康检查  失败  时的脚本
-	notify_down "/bin/bash /opt/lvs/scripts/rs_state_change.sh 172.17.2.236 172.18.2.198 0 80 8080"
+	notify_down "/bin/bash /opt/lvs/scripts/rs_state_change.sh 173.17.2.236 173.18.2.198 0 80 8080"
     #后端服务器权重
 	weight 1
     #后端服务器健康检查
@@ -342,7 +342,7 @@ real_server 172.18.2.198 8080 {
 
 #### 后端服务器需要配置默认网关为LAN_GATEWAY中的VIP
 
-![TIM图片20180613172610](https://qiniu.li-rui.top/TIM%E5%9B%BE%E7%89%8720180613172610.png)
+![TIM图片20180613172610](https://qiniu.li-rui.top/TIM%E5%9B%BE%E7%89%8720180613172622.png)
 
 - 模板配置文件
 
@@ -377,9 +377,9 @@ vrrp_instance VI_1 {
        auth_type PASS
        auth_pass 1111
    }
-unicast_src_ip  172.16.2.225
+unicast_src_ip  173.16.2.225
    unicast_peer {
-       172.16.2.226
+       173.16.2.226
    }
    
 #track_script {
@@ -403,7 +403,7 @@ vrrp_instance VI_GATEWAY {
             auth_pass 2222 
         } 
         virtual_ipaddress { 
-            172.16.2.227/24 dev eth1 label eth1:0
+            173.16.2.227/24 dev eth1 label eth1:0
         } 
 }
 
@@ -413,7 +413,7 @@ delay_loop 15
 lb_algo rr
 lb_kind NAT
 protocol TCP 
-real_server 172.16.2.222 80 {
+real_server 173.16.2.222 80 {
   weight 1
   TCP_CHECK { 
     connect_port 80
@@ -422,7 +422,7 @@ real_server 172.16.2.222 80 {
 	delay_before_retry 4
 	} 
 }
-real_server 172.16.2.223 80 {
+real_server 173.16.2.223 80 {
   weight 1 
   TCP_CHECK {
     connect_port 80
@@ -472,9 +472,9 @@ vrrp_instance VI_1 {
 #track_script {
 #   chk_nginx
 #   }
-unicast_src_ip  172.16.2.226
+unicast_src_ip  173.16.2.226
    unicast_peer {
-       172.16.2.225
+       173.16.2.225
    }   
 
    virtual_ipaddress {
@@ -494,7 +494,7 @@ vrrp_instance VI_GATEWAY {
             auth_pass 2222
         }
         virtual_ipaddress {
-            172.16.2.227/24 dev eth1 label eth1:0
+            173.16.2.227/24 dev eth1 label eth1:0
         }
 }
 
@@ -505,7 +505,7 @@ delay_loop 15
 lb_algo rr
 lb_kind NAT
 protocol TCP 
-real_server 172.16.2.222 80 {
+real_server 173.16.2.222 80 {
   weight 1
   TCP_CHECK { 
     connect_port 80
@@ -514,7 +514,7 @@ real_server 172.16.2.222 80 {
 	delay_before_retry 4
 	} 
 }
-real_server 172.16.2.223 80 {
+real_server 173.16.2.223 80 {
   weight 1 
   TCP_CHECK {
     connect_port 80
@@ -527,7 +527,7 @@ real_server 172.16.2.223 80 {
 
 ```
 
-**后端服务器172.16.2.223/222.默认网关设置为172.16.2.227**
+**后端服务器173.16.2.223/222.默认网关设置为173.16.2.227**
 
 ### 4. DR直接路由模式
 
@@ -547,19 +547,19 @@ real_server 172.16.2.223 80 {
 负载均衡器
 
 ```bash
-#负载均衡器上配置虚拟IP172.16.206.110
+#负载均衡器上配置虚拟IP173.16.206.110
 #掩码为255.255.255.255每个IP就是一个网段，这样以来在后端服务器器上添加同一个IP地址就不会警告IP冲突。广播地址也是自己
-ifconfig eth0:0 172.16.206.110 netmask 255.255.255.255 broadcast 172.16.206.110
+ifconfig eth0:0 173.16.206.110 netmask 255.255.255.255 broadcast 173.16.206.110
 
 #负载均衡器上关闭防火墙
 service iptables stop
 
 #创建负载均衡集群，轮询调度
-ipvsadm -A -t 172.16.206.110:80 -s rr
+ipvsadm -A -t 173.16.206.110:80 -s rr
 
 #添加后端服务器
-ipvsadm -a -t 172.16.206.110:80 -r 172.16.206.128 -g
-ipvsadm -a -t 172.16.206.110:80 -r 172.16.206.130 -g
+ipvsadm -a -t 173.16.206.110:80 -r 173.16.206.128 -g
+ipvsadm -a -t 173.16.206.110:80 -r 173.16.206.130 -g
 
 ```
 
@@ -568,10 +568,10 @@ ipvsadm -a -t 172.16.206.110:80 -r 172.16.206.130 -g
 ```bash
 #配置虚拟IP
 #负载均衡器只是改了目标mac，并没有改动目标IP，后端服务器上配置IP是为了接受负载均衡器的数据包而不是因为自己主机上没有这个IP而去丢弃数据包
-ifconfig lo:0 172.16.206.110 netmask 255.255.255.255 broadcast 172.16.206.110
+ifconfig lo:0 173.16.206.110 netmask 255.255.255.255 broadcast 173.16.206.110
 
 #添加路由规则(非必需)
-route add -host 172.16.206.110 dev lo:0
+route add -host 173.16.206.110 dev lo:0
 
 #抑制ARP
 #为什么要抑制arp，因为必须要确保vip所映射的mac是负载均衡器的mac而不是后端服务器的mac

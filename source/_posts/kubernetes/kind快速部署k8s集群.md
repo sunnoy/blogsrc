@@ -66,7 +66,7 @@ kubeadmConfigPatches:
   metadata:
     name: config
   networking:
-    serviceSubnet: 10.0.0.0/16
+    serviceSubnet: 22.0.0.0/16
 kubeadmConfigPatchesJson6902:
 - group: kubeadm.k8s.io
   version: v1beta2

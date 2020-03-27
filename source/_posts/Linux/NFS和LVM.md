@@ -12,7 +12,7 @@ yum install -y nfs-utils rpcbind
 
 #配置
 vi /etc/exports
-/kuaiyun/static 172.16.2.0/24(rw,no_root_squash,sync) 172.16.3.0/24(rw,no_root_squash,sync)
+/kuaiyun/static 173.16.2.0/24(rw,no_root_squash,sync) 173.16.3.0/24(rw,no_root_squash,sync)
 
 #启动服务
 chkconfig nfs on
@@ -38,7 +38,7 @@ net start pcnfsd >>c:\nfs.log
 net use /pers:no >>c:\nfs.log  
 mount -o mtype=hard -o pcnfs=localhost -u:root 192.168.6.55:/vmsnfs N: >>c:\nfs.log  
 dir N: >>c:\nfs.log   
-mount 172.16.3.202:/kuaiyun/static N:
+mount 173.16.3.202:/kuaiyun/static N:
 
 #windows通过映射网络驱动器挂载
 
@@ -59,13 +59,13 @@ mount 172.16.3.202:/kuaiyun/static N:
 
 ```bash
 #查看服务端状态，服务端IP
-showmount -e 172.16.3.202
+showmount -e 173.16.3.202
 #客户端需要安装
 yum install nfs-utils -y
 #挂载，默认为hard挂载
-mount -t nfs -o rw 10.140.133.9:/export/home/sunky /mnt/nfs
+mount -t nfs -o rw 22.140.133.9:/export/home/sunky /mnt/nfs
 #软挂载
-mount -t nfs -o soft 10.220.129.47:/data data/
+mount -t nfs -o soft 22.220.129.47:/data data/
 ```
 
 逻辑卷

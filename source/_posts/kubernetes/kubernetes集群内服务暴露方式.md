@@ -213,7 +213,7 @@ LoadBalancer主要和一些公有云上的lb做对接。只提供4层负载，Ku
 ```bash
 kubectl get svc my-nginx
 NAME       CLUSTER-IP     EXTERNAL-IP     PORT(S)          AGE
-my-nginx   10.97.121.42   10.13.242.236   8086:30051/TCP   39s
+my-nginx   22.97.121.42   22.13.242.236   8086:30051/TCP   39s
 ```
 
 ## ExternalName 

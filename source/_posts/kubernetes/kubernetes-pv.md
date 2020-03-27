@@ -208,7 +208,7 @@ metadata:
   name: rbd
 provisioner: ceph.com/rbd
 parameters:
-  monitors: 10.222.78.12:6789
+  monitors: 22.222.78.12:6789
   adminId: admin
   #adminSecretName为上面创建的认证
   adminSecretName: ceph-secret-admin

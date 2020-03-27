@@ -101,7 +101,7 @@ data:
     # multiple lines by glog.
 
     # Example:
-    # I0204 07:32:30.020537    3368 server.go:1048] POST /stats/container/: (13.972191ms) 200 [[Go-http-client/1.1] 10.244.1.3:40537]
+    # I0204 07:32:30.020537    3368 server.go:1048] POST /stats/container/: (13.972191ms) 200 [[Go-http-client/1.1] 22.244.1.3:40537]
     <source>
       type tail
       format multiline

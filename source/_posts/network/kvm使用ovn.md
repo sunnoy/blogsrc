@@ -78,8 +78,8 @@ vm-lp=ovs-vsctl get interface $vm-port external_ids:iface-id | sed s/\"//g
 
 ```bash
 ovn-nbctl lsp-add vpc2 $vm-lp
-ovn-nbctl lsp-set-addresses $vm-lp "$vm-mac 172.77.1.109"
-ovn-nbctl lsp-set-port-security $vm-lp "$vm-mac 172.77.1.109"
+ovn-nbctl lsp-set-addresses $vm-lp "$vm-mac 173.77.1.109"
+ovn-nbctl lsp-set-port-security $vm-lp "$vm-mac 173.77.1.109"
 ```
 
 ### dhcp选项

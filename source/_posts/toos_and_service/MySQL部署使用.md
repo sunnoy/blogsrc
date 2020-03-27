@@ -390,7 +390,7 @@ mysql -uroot -p lecai_ga2 < lecai_ga2.sql
 #所有数据库
 mysqldump -uroot –all-databases
 #特定数据库
-mysqldump -uroot -h 10.0.0.5 -p2o#n1f831@#SD123abc --databases lecai_ga1  > lecai_ga2.sql
+mysqldump -uroot -h 22.0.0.5 -p2o#n1f831@#SD123abc --databases lecai_ga1  > lecai_ga2.sql
 
 mysqldump -uroot -p123456 -ntd -R --databases kuaiyun  privatecloud test yjk_client yjk_db yjk_instance > pcp.sql
 

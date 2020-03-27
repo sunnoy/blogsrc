@@ -68,8 +68,8 @@ http://www.openvswitch.org/download/
 #编译rpm包安装
 mkdir -p ~/rpmbuild/SOURCES/
 cd ~/rpmbuild/SOURCES/
-wget https://www.openvswitch.org/releases/openvswitch-2.10.1.tar.gz
-tar -xvf openvswitch-2.10.1.tar.gz && cd openvswitch-2.10.1
+wget https://www.openvswitch.org/releases/openvswitch-2.22.1.tar.gz
+tar -xvf openvswitch-2.22.1.tar.gz && cd openvswitch-2.22.1
 rpmbuild -bb --without check rhel/openvswitch.spec
 rpm -ivh --nodeps ~/rpmbuild/RPMS/x86_64/openvswitch*.rpm
 

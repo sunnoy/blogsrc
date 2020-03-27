@@ -89,7 +89,7 @@ ovs-vsctl --no-wait set bridge ovs-br0 other-config:tunnel-ip=$tunnelip
 
 ```bash
 #ovs添加控制器
-ip=172.16.248.153
+ip=173.16.248.153
 port=6633
 ovs-vsctl set-controller ovs-br0 tcp:$ip:$port
 
@@ -134,10 +134,10 @@ show onv all mac-address-table
 
 # Tenant  onv     Address Space MAC Address            VLAN IP Address Attachment Point Last Seen
 -|-------|-------|-------------|----------------------|----|----------|----------------|---------
-1 default default default       00:00:00:00:00:01 (h1)      10.0.0.1   s6/1 (s6-eth1)   0 minute
-2 default default default       00:00:00:00:00:02 (h2)      10.0.0.2   s6/2 (s6-eth2)   0 minute
-3 default default default       00:00:00:00:00:03 (h3)      10.0.0.3   s7/1 (s7-eth1)   0 minute
-4 default default default       00:00:00:00:00:04 (h4)      10.0.0.4   s7/2 (s7-eth2)   0 minute
+1 default default default       00:00:00:00:00:01 (h1)      22.0.0.1   s6/1 (s6-eth1)   0 minute
+2 default default default       00:00:00:00:00:02 (h2)      22.0.0.2   s6/2 (s6-eth2)   0 minute
+3 default default default       00:00:00:00:00:03 (h3)      22.0.0.3   s7/1 (s7-eth1)   0 minute
+4 default default default       00:00:00:00:00:04 (h4)      22.0.0.4   s7/2 (s7-eth2)   0 minute
 ```
 
 ### 创建两个租户以及VNS
@@ -166,7 +166,7 @@ oscp(config-tenant-def-onv)# exit
 有多种映射规则
 
 - port-based rules (port 42 on switch 3),
-- header-based rules (ip-subnet = 10.0.1.0/24),
+- header-based rules (ip-subnet = 22.0.1.0/24),
 - meta-data that has been populated from an external source, or
 - any combination of the above
 
@@ -199,7 +199,7 @@ oscp(config-tenant-def-onv-if-rule)# exit
 #仍然在devtest-vns内又添加一条规则 ip-3
 oscp(config-tenant-def-onv)# interface-rule ip-3
 #添加一个主机IP，主要掩码32位
-oscp(config-tenant-def-onv-if-rule)# match ip-subnet 10.0.0.3/32
+oscp(config-tenant-def-onv-if-rule)# match ip-subnet 22.0.0.3/32
 oscp(config-tenant-def-onv-if-rule)# end
 oscp# 
 ```

@@ -27,7 +27,7 @@ yum --enablerepo=epel -y install scsi-target-utils
     write-cache off
 </target>
 
-        <target iqn.2016-10.com.tjiyu:mystore.disk1>
+        <target iqn.2016-22.com.tjiyu:mystore.disk1>
  
             <backing-store /dev/sda5>
  

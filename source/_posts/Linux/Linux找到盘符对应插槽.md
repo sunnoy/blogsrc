@@ -325,7 +325,7 @@ https://github.com/sunnoy/blog-issue/blob/master/get_disk_slot.py
 
 -- Controller information --
 -- ID | H/W Model            | RAM    | Temp | BBU    | Firmware
-c0    | PERC H700 Integrated | 1024MB | N/A  | Good   | FW: 12.10.4-0001
+c0    | PERC H700 Integrated | 1024MB | N/A  | Good   | FW: 12.22.4-0001
 
 -- Array information --
 -- ID | Type   |    Size |  Strpsz |   Flags | DskCache |   Status |  OS Path | CacheCade        |InProgress

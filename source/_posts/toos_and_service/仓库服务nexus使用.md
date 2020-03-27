@@ -99,7 +99,7 @@ nexus可以使用ldap以及本地账户形式
 和harbor不同，不用新建专门的project直接tag路径就可以
 
 ```bash
-docker tag sonatype/nexus3:latest 172.18.247.204:5000/su/kg:9.0
+docker tag sonatype/nexus3:latest 173.18.247.204:5000/su/kg:9.0
 ```
 
 可能需要配置docker配置
@@ -107,7 +107,7 @@ docker tag sonatype/nexus3:latest 172.18.247.204:5000/su/kg:9.0
 ```json
 // /etc/docker/daemon.json
 {
-  "insecure-registries": ["172.18.247.204:5000"]
+  "insecure-registries": ["173.18.247.204:5000"]
 }
 ```
 

@@ -69,7 +69,7 @@ T: Starting network proxy to cluster using new Deployment myserver
 T: Forwarding remote port 80 to local port 808.
 
 # 集群内的服务
-myserver     ClusterIP   10.68.181.94   <none>        80/TCP    53s
+myserver     ClusterIP   22.68.181.94   <none>        80/TCP    53s
 ```
 
 ## 替换集群内的deployment

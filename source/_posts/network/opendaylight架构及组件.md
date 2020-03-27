@@ -422,7 +422,7 @@ Accept: application/xml
 ### 查询流表url
 
 ```bash
-http://10.220.129.158:8181/restconf/operational/opendaylight-inventory:nodes/node/openflow:1
+http://22.220.129.158:8181/restconf/operational/opendaylight-inventory:nodes/node/openflow:1
 ```
 
 ## post请求信息
@@ -487,7 +487,7 @@ Content-type: application/xml
 主要使用了swagger。需要登陆
 
 ```bash
-http://10.220.129.158:8181/apidoc/explorer/index.html
+http://22.220.129.158:8181/apidoc/explorer/index.html
 ```
 
 

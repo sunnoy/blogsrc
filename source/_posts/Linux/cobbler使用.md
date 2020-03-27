@@ -36,10 +36,10 @@ systemctl disable firewalld
 
 ```yml
 #cobbler服务器的IP
-server: 10.0.0.7
+server: 22.0.0.7
 
 #dhcp服务器next_server
-next_server: 10.0.0.7
+next_server: 22.0.0.7
 
 #激活管理dhcp
 manage_dhcp: 1
@@ -235,14 +235,14 @@ $yum_config_stanza
 #发行版的自带源
 [core-0]
 name=core-0
-baseurl=http://172.17.10.14/cobbler/ks_mirror/centos5.8-x86_64
+baseurl=http://173.17.22.14/cobbler/ks_mirror/centos5.8-x86_64
 enabled=1
 gpgcheck=0
 priority=1
 #添加的源
 [centos5.8-x86_64-base]
 name=centos5.8-x86_64-base
-baseurl=http://172.17.10.14/cobbler/repo_mirror/centos5.8-x86_64-base
+baseurl=http://173.17.22.14/cobbler/repo_mirror/centos5.8-x86_64-base
 enabled=1
 priority=99
 gpgcheck=0

@@ -79,9 +79,9 @@ cp -fp snapshot.db snapshot-$(date +'%Y%m%d%H%M').db
 ```bash
 !/bin/bash
 
-ETCD_1=10.1.0.5
-ETCD_2=10.1.0.6
-ETCD_3=10.1.0.7
+ETCD_1=22.1.0.5
+ETCD_2=22.1.0.6
+ETCD_3=22.1.0.7
 
 for i in ETCD_1 ETCD_2 ETCD_3
 do

@@ -208,7 +208,7 @@ virsh edit centos80
     <secret type='ceph' uuid='77085c23-2177-242d-7661-c785df7f6230'/>
     </auth>
     <source protocol='rbd' name='rbd/librbda'>
-    <host name='10.216.19.23' port='6789'/>
+    <host name='22.216.19.23' port='6789'/>
     </source>
     <target dev='vdb' bus='virtio'/>
     <address type='pci' domain='0x0000' bus='0x00' slot='0x12' function='0x0'/>
@@ -220,7 +220,7 @@ virsh edit centos80
     <secret type='ceph' uuid='88085c23-2177-242d-7661-c785df7f6230'/>
     </auth>
     <source protocol='rbd' name='libvirt-pool/librbd'>
-    <host name='10.216.19.26' port='6789'/>
+    <host name='22.216.19.26' port='6789'/>
     </source>
     <target dev='vdc' bus='virtio'/>
     <address type='pci' domain='0x0000' bus='0x00' slot='0x13' function='0x0'/>

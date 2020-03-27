@@ -297,7 +297,7 @@ store: <string>
 # cassandra. If omitted, defaults to same value as store.
 [object_store: <string>]
 
-# The schema to use. Set to v9 or v10.
+# The schema to use. Set to v9 or v22.
 schema: <string>
 
 # Configures how the index is updated and stored.
@@ -320,7 +320,7 @@ chunks:
   tags:
     [<string>: <string> ...]
 
-# How many shards will be created. Only used if schema is v10.
+# How many shards will be created. Only used if schema is v22.
 [row_shards: <int> | default = 16]
 ```
 

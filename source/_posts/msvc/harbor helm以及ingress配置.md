@@ -79,8 +79,8 @@ pvc-2b12fe19-82d1-11e9-8307-525400d86b78   1Gi        RWO            Delete     
 ## hosts配置
 
 ```bash
-10.9.90.161 ddd.com
-10.9.90.161 aaa.com
+22.9.90.161 ddd.com
+22.9.90.161 aaa.com
 ```
 
 ## docker进程配置

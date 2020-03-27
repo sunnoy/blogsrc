@@ -72,7 +72,7 @@ C:\Program Files (x86)\Microsoft Office\Office16
 C:\Program Files\Microsoft Office\Office16
 ```
 
-office16是office2016，office15就是2013，office14就是2010.
+office16是office2016，office15就是2013，office14就是2022.
 
 然后目录对的话，该目录下面应该有个OSPP.VBS。
 

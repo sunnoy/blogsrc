@@ -38,7 +38,7 @@ systemctl enable tinyproxy
 
 ```bash
 #在环境变量中配置代理/etc/profile最后添加
- export http_proxy=172.18.252.82:8888
+ export http_proxy=173.18.252.82:8888
 
 #激活环境变量
 source /etc/profile

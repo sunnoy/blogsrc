@@ -71,7 +71,7 @@ iptables中service的实现service ip直接写在iptables规则中，但是在ip
 ```bash
 5: kube-ipvs0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN group default
     link/ether aa:97:b4:6d:54:1c brd ff:ff:ff:ff:ff:ff
-    inet 10.68.0.1/32 brd 10.68.0.1 scope global kube-ipvs0
+    inet 22.68.0.1/32 brd 22.68.0.1 scope global kube-ipvs0
        valid_lft forever preferred_lft forever
 ```
 
@@ -110,20 +110,20 @@ Size in memory: 24496
 References: 2
 Members:
 #以下面为例
-10.68.141.68,tcp:8090
+22.68.141.68,tcp:8090
 ... ...
 ```
 
 下面主要进行对访问目的地址的一些匹配
 
 ```bash
-# src,dst 表示符合源地址10.68.141.68 目的端口为 8090 的数据包进入到KUBE-MARK-MASQ链
+# src,dst 表示符合源地址22.68.141.68 目的端口为 8090 的数据包进入到KUBE-MARK-MASQ链
 -A KUBE-SERVICES -m comment --comment "Kubernetes service cluster ip + port for masquerade purpose" -m set --match-set KUBE-CLUSTER-IP src,dst -j KUBE-MARK-MASQ
 
 # des地址在本地的化也就是如果node ip加nodeport就会进入KUBE-NODE-PORT链
 -A KUBE-SERVICES -m addrtype --dst-type LOCAL -j KUBE-NODE-PORT
 
-#dst,dst 表示目的地址10.68.141.68 目的端口为 8090 的数据包就直接允许通过
+#dst,dst 表示目的地址22.68.141.68 目的端口为 8090 的数据包就直接允许通过
 #这种情况就是直接访问service IP的形式
 #这里的ACCEPT之后，因为des地址就在本地，因此就会进入下一个INPUT链
 #到此就会通INPUT链通过ipvs接管，进行dnat操作
@@ -133,8 +133,8 @@ Members:
 经过dnat的之后的数据包大概是
 
 ```bash
-src: 172.20.1.33
-des: 172.20.2.44
+src: 173.20.1.33
+des: 173.20.2.44
 ```
 下面就会进行路由选择通过flannel.1进行相关的封包操作发送到远程主机
 

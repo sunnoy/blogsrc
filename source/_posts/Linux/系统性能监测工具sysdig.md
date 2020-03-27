@@ -34,7 +34,7 @@ yum -y install kernel-devel*  dkms  sysdig
 /usr/bin/sysdig-probe-loader
 
 #需要下载依赖
-https://s3.amazonaws.com/download.draios.com/stable/sysdig-probe-binaries/sysdig-probe-0.26.2-x86_64-3.10.0-693.2.2.el7.x86_64-9807bc1a2c8241700526cea7e11fbc8a.ko
+https://s3.amazonaws.com/download.draios.com/stable/sysdig-probe-binaries/sysdig-probe-0.26.2-x86_64-3.22.0-693.2.2.el7.x86_64-9807bc1a2c8241700526cea7e11fbc8a.ko
 
 #放到目录
 /root/.sysdig

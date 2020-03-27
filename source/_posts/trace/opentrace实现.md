@@ -56,7 +56,7 @@ docker run -d --name jaeger \
 			Param: 1,
 		},
 		Reporter: &config.ReporterConfig{
-			CollectorEndpoint: "http://172.18.247.201:14268/api/traces",
+			CollectorEndpoint: "http://173.18.247.201:14268/api/traces",
 			LogSpans:          true,
 		},
 	}

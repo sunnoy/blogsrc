@@ -22,6 +22,6 @@ net.ipv4.tcp_keepalive_intvl = 75 发送频率
 # 查看是否开启
 
 ```bash
-netstat -altpno | grep "10.173.27.254:22"
-ss -aoen|grep 10.24.160.254:55098|grep ESTAB
+netstat -altpno | grep "22.173.27.254:22"
+ss -aoen|grep 22.24.160.254:55098|grep ESTAB
 ```

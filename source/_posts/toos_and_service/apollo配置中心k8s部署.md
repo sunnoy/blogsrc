@@ -152,7 +152,7 @@ metadata:
   name: service-mysql-for-apollo-prod-env
 subsets:
   - addresses:
-      - ip: 10.9.1.146
+      - ip: 22.9.1.146
     ports:
       - protocol: TCP
         port: 13306
@@ -512,16 +512,16 @@ statefulset-apollo-config-server-prod-2                1/1     Running   0      
 ```bash
 [root@dev-k8s-node1 apollo]# kubectl get svc -n sre 
 NAME                                TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
-service-apollo-admin-server-dev     ClusterIP   10.68.101.110   <none>        8090/TCP         36m
-service-apollo-admin-server-prod    ClusterIP   10.68.234.143   <none>        8090/TCP         73m
-service-apollo-config-server-dev    NodePort    10.68.185.10    <none>        8080:30002/TCP   84m
-service-apollo-config-server-prod   NodePort    10.68.229.144   <none>        8080:30005/TCP   73m
+service-apollo-admin-server-dev     ClusterIP   22.68.101.110   <none>        8090/TCP         36m
+service-apollo-admin-server-prod    ClusterIP   22.68.234.143   <none>        8090/TCP         73m
+service-apollo-config-server-dev    NodePort    22.68.185.10    <none>        8080:30002/TCP   84m
+service-apollo-config-server-prod   NodePort    22.68.229.144   <none>        8080:30005/TCP   73m
 service-apollo-meta-server-dev      ClusterIP   None            <none>        8080/TCP         84m
 service-apollo-meta-server-prod     ClusterIP   None            <none>        8080/TCP         73m
-service-apollo-portal-server        NodePort    10.68.67.33     <none>        8070:30001/TCP   66m
-service-mysql-for-apollo-dev-env    ClusterIP   10.68.17.239    <none>        3306/TCP         104m
-service-mysql-for-apollo-prod-env   ClusterIP   10.68.221.124   <none>        3306/TCP         73m
-service-mysql-for-portal-server     ClusterIP   10.68.40.79     <none>        3306/TCP         66m
+service-apollo-portal-server        NodePort    22.68.67.33     <none>        8070:30001/TCP   66m
+service-mysql-for-apollo-dev-env    ClusterIP   22.68.17.239    <none>        3306/TCP         104m
+service-mysql-for-apollo-prod-env   ClusterIP   22.68.221.124   <none>        3306/TCP         73m
+service-mysql-for-portal-server     ClusterIP   22.68.40.79     <none>        3306/TCP         66m
 
 ```
 # 应用接入

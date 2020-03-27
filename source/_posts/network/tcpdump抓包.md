@@ -18,7 +18,7 @@ yum install tcpdump -y
 
 ```bash
 #tcp和主机
-tcpdump tcp port 23 and host 210.27.48.1
+tcpdump tcp port 23 and host 222.27.48.1
 #网卡
 tcpdump -i eth0
 #输出文件使用wirshack分析

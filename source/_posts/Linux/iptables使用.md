@@ -120,17 +120,17 @@ service iptables save
 - windows远程桌面
 
 ```bash
-iptables -t nat -I PREROUTING -p tcp -m tcp --dport 3389 -j DNAT --to-destination 10.100.0.236:3389
+iptables -t nat -I PREROUTING -p tcp -m tcp --dport 3389 -j DNAT --to-destination 22.100.0.236:3389
 
-iptables -t nat -I POSTROUTING -d 10.100.0.236 -p tcp -m tcp --dport 3389 -j SNAT --to-source 10.220.129.212
+iptables -t nat -I POSTROUTING -d 22.100.0.236 -p tcp -m tcp --dport 3389 -j SNAT --to-source 22.220.129.212
 
 ```
 
 - 数据库端口转发
 
 ```bash
-iptables -t nat -A PREROUTING -p tcp -m tcp --dport 3389 -j DNAT --to-destination 10.100.0.236:3389
-iptables -t nat -A POSTROUTING -d 10.100.0.236 -p tcp -m tcp --dport 3389 -j SNAT --to-source 10.220.129.212
+iptables -t nat -A PREROUTING -p tcp -m tcp --dport 3389 -j DNAT --to-destination 22.100.0.236:3389
+iptables -t nat -A POSTROUTING -d 22.100.0.236 -p tcp -m tcp --dport 3389 -j SNAT --to-source 22.220.129.212
 ```
 
 - IP分享器
@@ -139,12 +139,12 @@ iptables -t nat -A POSTROUTING -d 10.100.0.236 -p tcp -m tcp --dport 3389 -j SNA
 
 ```bash
 #分享器
-#外网网卡eth0，IP为公网IP：122.114.196.212。内网网卡eth2，IP为：10.220.129.212
+#外网网卡eth0，IP为公网IP：122.114.196.212。内网网卡eth2，IP为：22.220.129.212
 
-#内网主机，IP为10.220.129.44-45.网关设置为10.220.129.212
+#内网主机，IP为22.220.129.44-45.网关设置为22.220.129.212
 
 #限制内网主机上网
-iptables -t nat -I POSTROUTING -s 10.220.129.44 -j SNAT --to-source 122.114.196.212
+iptables -t nat -I POSTROUTING -s 22.220.129.44 -j SNAT --to-source 122.114.196.212
 
 #内网主机都可以
 iptables -t nat -A POSTROUTING -j SNAT --to-source 122.114.196.212
@@ -155,12 +155,12 @@ iptables -t nat -A POSTROUTING -j MASQUERADE
 ```
 
 >内网的机器是如何通过nat访问公网的？
->内网机器去访问114.114.114.114，它的数据包为(s:10.220.129.44,d:114.114.114.114)
->数据包到达内网机器的OUTPUT链后，依据内网机器路由表除了默认路由到114.114.114.114的匹配，于是就把数据包交给默认网关10.220.129.212（也就是nat服务器）
+>内网机器去访问114.114.114.114，它的数据包为(s:22.220.129.44,d:114.114.114.114)
+>数据包到达内网机器的OUTPUT链后，依据内网机器路由表除了默认路由到114.114.114.114的匹配，于是就把数据包交给默认网关22.220.129.212（也就是nat服务器）
 >nat服务器收到该数据包后，经过PREROUTING链然后进行路由判断，发现本机路由表也没有，于是交给nat服务器默认网关122.114.196.129，并通过eth0发出，然后进入FORWARD链，接着进入POSTROUTING链。
 >到了POSTROUTING因为匹配到了设定规则数据包就会改为(s:122.114.196.212,d:114.114.114.114)，在此会对这个转发进行追踪，依据ip_conntrack模块。进而有eth0发出到下一跳，最终到达114.114.114.114
 
->数据包(s:114.114.114.114,d:122.114.196.212)到达nat服务器，在PREROUTING链之前就会检查ip_conntrack模块，查到记录后直DNAT接转数据包(s:114.114.114.114,d:10.220.129.44)
+>数据包(s:114.114.114.114,d:122.114.196.212)到达nat服务器，在PREROUTING链之前就会检查ip_conntrack模块，查到记录后直DNAT接转数据包(s:114.114.114.114,d:22.220.129.44)
 
 **可见SNAT不同于DNAT，只需要设定一条SNAT规则。不管是DNAT还是SNAT都会发生DNAT和SNAT。区别在于数据包的前半程干啥**
 
@@ -169,7 +169,7 @@ iptables -t nat -A POSTROUTING -j MASQUERADE
 ### 2. 仅仅允许某一个
 
 ```bash
-iptables -I INPUT -i eth0 -s 110.112.0.171 -j ACCEPT
+iptables -I INPUT -i eth0 -s 122.112.0.171 -j ACCEPT
 iptables -I INPUT -i eth1 -p tcp -j ACCEPT
 iptables -A INPUT -i eth0 -j DROP
 #执行顺序

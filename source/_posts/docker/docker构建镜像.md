@@ -657,7 +657,7 @@ ADD run-novmc.sh /usr/bin/
 RUN mkdir kvm-novnc && \
     yum install iproute telnet tcpdump kde-l10n-Chinese sqlite gcc gcc-c++ python-devel  -y && \
     yum clean all && \
-    cd numpy-1.10.4 && python setup.py install && cd .. && \
+    cd numpy-1.22.4 && python setup.py install && cd .. && \
     cd setuptools-1.4.2 && python2.7 setup.py install && cd .. && \
     cd websockify-master && python setup.py install && cd .. && \
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \

@@ -188,7 +188,7 @@ POST /sales/_search
                   "value": 60.0
                },
                "cumulative_sales": {
-                  "value": 610.0
+                  "value": 622.0
                }
             },
             {

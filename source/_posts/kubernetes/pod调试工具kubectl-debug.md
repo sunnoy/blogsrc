@@ -135,7 +135,7 @@ bash-5.0# ip a
        valid_lft forever preferred_lft forever
 3: eth0@if38: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default
     link/ether 6e:0b:b5:b5:12:ad brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 172.20.0.32/24 scope global eth0
+    inet 173.20.0.32/24 scope global eth0
        valid_lft forever preferred_lft forever
 ```
 

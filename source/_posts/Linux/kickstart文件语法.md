@@ -65,7 +65,7 @@ firewall --disabled
 #### url
 
 ```bash
-url --url="http://172.16.0.11/cobbler/ks_mirror/CentOS-7.2-x86_64/"
+url --url="http://173.16.0.11/cobbler/ks_mirror/CentOS-7.2-x86_64/"
 ```
 
 #### keyboard必须
@@ -86,7 +86,7 @@ lang en_US --addsupport=zh_CN
 为目标系统指定网络配置
 
 ```bash
-network --bootproto=static --ip=10.0.2.15 --netmask=255.255.255.0 --gateway=10.0.2.254 --nameserver=192.168.2.1 --nameserver=192.168.3.1 --device=em1
+network --bootproto=static --ip=22.0.2.15 --netmask=255.255.255.0 --gateway=22.0.2.254 --nameserver=192.168.2.1 --nameserver=192.168.3.1 --device=em1
 ```
 
 #### part或者partition必须
@@ -259,15 +259,15 @@ $SNIPPET('log_ks_post_nochroot')
 #yum repo
 
 rm -rf /etc/yum.repos.d/CentOS-Base.repo
-curl -L  http://172.16.1.2/repo/base.repo -o /etc/yum.repos.d/base.repo
+curl -L  http://173.16.1.2/repo/base.repo -o /etc/yum.repos.d/base.repo
 yum -y install epel-release
 rm -rf /etc/yum.repos.d/epel*
-curl -L  http://172.16.1.2/repo/epel.repo -o /etc/yum.repos.d/epel.repo
+curl -L  http://173.16.1.2/repo/epel.repo -o /etc/yum.repos.d/epel.repo
 
 
 # kernel install
-curl -L  http://172.16.1.2/kernel/kernel-3.18.16-1.x86_64.rpm -o /tmp/kernel-3.18.16-1.x86_64.rpm
-curl -L  http://172.16.1.2/kernel/kernel-devel-3.18.16-1.x86_64.rpm -o /tmp/kernel-devel-3.18.16-1.x86_64.rpm
+curl -L  http://173.16.1.2/kernel/kernel-3.18.16-1.x86_64.rpm -o /tmp/kernel-3.18.16-1.x86_64.rpm
+curl -L  http://173.16.1.2/kernel/kernel-devel-3.18.16-1.x86_64.rpm -o /tmp/kernel-devel-3.18.16-1.x86_64.rpm
 rpm -i /tmp/kernel-3.18.16-1.x86_64.rpm
 rpm -i /tmp/kernel-devel-3.18.16-1.x86_64.rpm
 grub2-set-default 'CentOS Linux (3.18.16) 7 (Core)'

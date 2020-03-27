@@ -202,7 +202,7 @@ baseurl就是个站点url可以为非80端口，但是入口必须是rpm包所�
 [root@com03 yum.repos.d]# yum makecache
 Loaded plugins: fastestmirror
 Loading mirror speeds from cached hostfile
-http://172.16.1.54:81/repodata/repomd.xml: [Errno 14] HTTP Error 404 - Not Found
+http://173.16.1.54:81/repodata/repomd.xml: [Errno 14] HTTP Error 404 - Not Found
 
 ```
 

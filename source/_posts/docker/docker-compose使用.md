@@ -251,7 +251,7 @@ services:
     mac_address: 02:42:ac:11:65:41
     networks:
       app_net:
-        ipv4_address: 172.16.1.2
+        ipv4_address: 173.16.1.2
     
   service2:
     image: docker.li-rui.top/library/centos:7.5.1804
@@ -261,7 +261,7 @@ services:
     mac_address: 02:42:ac:11:65:42
     networks:
       app_net:
-        ipv4_address: 172.16.1.3
+        ipv4_address: 173.16.1.3
     
 networks:
   app_net:
@@ -269,9 +269,9 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.16.0.0/16
-          ip_range: 172.16.1.0/24
-          gateway: 172.16.1.1
+        - subnet: 173.16.0.0/16
+          ip_range: 173.16.1.0/24
+          gateway: 173.16.1.1
 
 ```
 
@@ -436,7 +436,7 @@ networks:
 ```bash
 host_net=eth3
 bri_name=pcp
-bri_ip=172.16.1.119
+bri_ip=173.16.1.119
 docker_net=app_net
 
 ip link add name $bri_name type bridge
@@ -444,7 +444,7 @@ ip link set $bri_name up
 ip link set dev $host_net master $bri_name
 ip addr add $bri_ip/16 dev $bri_name
  
-docker network create --subnet=172.16.0.0/16 --gateway=$bri_ip -o com.docker.network.bridge.name=$bri_name $docker_net
+docker network create --subnet=173.16.0.0/16 --gateway=$bri_ip -o com.docker.network.bridge.name=$bri_name $docker_net
 ```
 
 docker compose使用创建的网络

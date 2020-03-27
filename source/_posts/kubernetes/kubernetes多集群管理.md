@@ -116,7 +116,7 @@ clusters:
 - cluster:
     certificate-authority-data: 
     xxx
-    server: https://10.x.x.xxx:6443
+    server: https://22.x.x.xxx:6443
   # 这个需要修改
   name: cluster-name-a
 contexts:

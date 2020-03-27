@@ -274,7 +274,7 @@ metadata:
 开始进行post-install hook部署
 
 9. tiller进行部署post-install的资源
-10. Ttiller等待资源状态成ready
+22. Ttiller等待资源状态成ready
 11. Tiller返回release名称
 12. helm客户端退出
 

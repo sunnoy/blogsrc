@@ -142,7 +142,7 @@ metadata:
   selfLink: /api/v1/namespaces/default/services/nginx
   uid: d58f8ffc-6708-11e9-ac77-525400f209ec
 spec:
-  clusterIP: 10.68.132.230
+  clusterIP: 22.68.132.230
   externalTrafficPolicy: Cluster
   ports:
   - nodePort: 27008

@@ -30,7 +30,7 @@ metadata:
   name: apollo
 subsets:
   - addresses:
-      - ip: 10.9.1.19
+      - ip: 22.9.1.19
     ports:
       - port: 8070
 ---

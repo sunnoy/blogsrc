@@ -81,7 +81,7 @@ vi /etc/systemd/system/docker.service.d/http-proxy.conf
 
 ```bash
 [Service]
-Environment="HTTP_PROXY=http://10.100.0.236:1080/" "NO_PROXY=localhost,127.0.0.1,daocloud.io"
+Environment="HTTP_PROXY=http://22.100.0.236:1080/" "NO_PROXY=localhost,127.0.0.1,daocloud.io"
 ```
 
 - 使配置生效，并检查

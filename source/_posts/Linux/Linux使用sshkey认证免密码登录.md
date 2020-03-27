@@ -59,17 +59,17 @@ total 16
 #### 导入key
 
 ```bash
-[root@node1 .ssh]# ssh-copy-id 172.17.10.8
-The authenticity of host '172.17.10.8 (172.17.10.8)' can't be established.
+[root@node1 .ssh]# ssh-copy-id 173.17.22.8
+The authenticity of host '173.17.22.8 (173.17.22.8)' can't be established.
 ECDSA key fingerprint is d2:50:63:f3:82:05:37:6e:17:3e:bc:de:d6:26:16:38.
 Are you sure you want to continue connecting (yes/no)? yes
 /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
 /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
-root@172.17.10.8's password:
+root@173.17.22.8's password:
 
 Number of key(s) added: 1
 
-Now try logging into the machine, with:   "ssh '172.17.10.8'"
+Now try logging into the machine, with:   "ssh '173.17.22.8'"
 and check to make sure that only the key(s) you wanted were added.
 
 ```

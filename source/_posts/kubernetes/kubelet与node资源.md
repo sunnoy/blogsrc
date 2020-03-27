@@ -55,7 +55,7 @@ authorization:
 cgroupDriver: cgroupfs
 cgroupsPerQOS: true
 clusterDNS:
-- 10.68.0.2
+- 22.68.0.2
 clusterDomain: cluster.local.
 configMapAndSecretChangeDetectionStrategy: Watch
 containerLogMaxFiles: 3

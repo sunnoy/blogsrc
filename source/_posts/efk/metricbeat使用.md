@@ -183,7 +183,7 @@ metricbeat所采集的数据流向配置，从上面知道metricbeat采集的数
 导入模板文件需要先禁用输出到logstash，然后连接到Elasticsearch进行模板导入
 
 ```bash
-metricbeat setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["172.16.1.110:9200"]'
+metricbeat setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["173.16.1.110:9200"]'
 ```
 
 ### module配置

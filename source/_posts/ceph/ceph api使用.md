@@ -45,7 +45,7 @@ ceph auth get-or-create client.restapi mds 'allow' osd 'allow *' mon 'allow *' >
 log file = /var/log/ceph/ceph.restapi.log
 keyring = /etc/ceph/ceph.client.restapi.keyring
 #可以更改端口，默认 0.0.0.0:5000
-public addr = 172.17.12.8:2325
+public addr = 173.17.12.8:2325
 #日志级别，可选critical, error, warning(默认), info, debug
 restapi log level = warning
 ```
@@ -103,7 +103,7 @@ ceph mgr module disable <module>
 ceph mgr services
 {
     "dashboard": "http://matrix_03:7000/",
-    "restful": "https://172.20.1.103:8003/"
+    "restful": "https://173.20.1.103:8003/"
 }
 
 ```

@@ -68,7 +68,7 @@ TOKEN=$(kubectl get secret -n spinnaker $TOKEN_SECRET -o jsonpath='{.data.token}
 #通token来配置kubectl来认证
 kubectl config set-credentials spinnaker-token-user --token $TOKEN
 
-kubectl config set-cluster k8s --server=https://172.24.41.238:6443  --insecure-skip-tls-verify=true
+kubectl config set-cluster k8s --server=https://173.24.41.238:6443  --insecure-skip-tls-verify=true
 
 kubectl config set-context k8s --cluster=k8s --user=spinnaker-token-user
 

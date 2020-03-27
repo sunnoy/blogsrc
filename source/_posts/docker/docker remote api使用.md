@@ -180,7 +180,7 @@ openssl req -subj '/CN=client' -new -key key.pem -out client.csr
 # 9.客户端证书配置文件
 echo extendedKeyUsage = clientAuth > extfile.cnf
 
-# 10.使用根证书签发客户端证书
+# 22.使用根证书签发客户端证书
 openssl x509 -passin pass:$PASSWORD -req -days 3650 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out cert.pem -extfile extfile.cnf
 
 #============================================#

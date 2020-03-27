@@ -389,7 +389,7 @@ pcs resource update nfs-ip cidr_netmask="16"
 
 ```bash
 pcs resource create nfs-ip ocf:heartbeat:IPaddr2 \
-        ip="172.16.3.200" cidr_netmask="24" nic="eth1" \
+        ip="173.16.3.200" cidr_netmask="24" nic="eth1" \
         op monitor interval="10s"
 ```
 
@@ -413,7 +413,7 @@ pcs resource create nfs-server service:nfs \
   op monitor interval="10s"
   
 pcs resource create nfs-exportfs ocf:heartbeat:exportfs \
-  clientspec="172.16.0.0/16" \
+  clientspec="173.16.0.0/16" \
   directory="/data" \
   fsid="0" \
   options="insecure,rw,async,no_root_squash" \

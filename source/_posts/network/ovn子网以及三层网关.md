@@ -21,8 +21,8 @@ systemctl start ovn-northd openvswitch
 ## 创建连接
 
 ```bash
-ovn-nbctl set-connection ptcp:6641:172.16.1.102
-ovn-sbctl set-connection ptcp:6642:172.16.1.102
+ovn-nbctl set-connection ptcp:6641:173.16.1.102
+ovn-sbctl set-connection ptcp:6642:173.16.1.102
 ```
 
 # 计算节点
@@ -48,13 +48,13 @@ ovn-encap-ip为和控制端同网段IP
 
 ```bash
 #第一台
-ovs-vsctl set Open_vSwitch . external-ids:ovn-remote=tcp:172.16.1.102:6642
+ovs-vsctl set Open_vSwitch . external-ids:ovn-remote=tcp:173.16.1.102:6642
 ovs-vsctl set Open_vSwitch . external-ids:ovn-encap-type=geneve
-ovs-vsctl set Open_vSwitch . external-ids:ovn-encap-ip=172.16.1.101
+ovs-vsctl set Open_vSwitch . external-ids:ovn-encap-ip=173.16.1.101
 #第二台
-ovs-vsctl set Open_vSwitch . external-ids:ovn-remote=tcp:172.16.1.102:6642
+ovs-vsctl set Open_vSwitch . external-ids:ovn-remote=tcp:173.16.1.102:6642
 ovs-vsctl set Open_vSwitch . external-ids:ovn-encap-type=geneve
-ovs-vsctl set Open_vSwitch . external-ids:ovn-encap-ip=172.16.1.103
+ovs-vsctl set Open_vSwitch . external-ids:ovn-encap-ip=173.16.1.103
 ```
 
 # 控制节点查看
@@ -63,10 +63,10 @@ ovs-vsctl set Open_vSwitch . external-ids:ovn-encap-ip=172.16.1.103
 
 ```bash
 [root@matrix_02 openvswitch]# netstat -anp | grep 664
-tcp        0      0 172.16.1.102:6641       0.0.0.0:*               LISTEN      1584905/ovsdb-serve
-tcp        0      0 172.16.1.102:6642       0.0.0.0:*               LISTEN      1584913/ovsdb-serve
-tcp        0      0 172.16.1.102:6642       172.16.1.101:52936      ESTABLISHED 1584913/ovsdb-serve
-tcp        0      0 172.16.1.102:6642       172.16.1.103:48560      ESTABLISHED 1584913/ovsdb-serve
+tcp        0      0 173.16.1.102:6641       0.0.0.0:*               LISTEN      1584905/ovsdb-serve
+tcp        0      0 173.16.1.102:6642       0.0.0.0:*               LISTEN      1584913/ovsdb-serve
+tcp        0      0 173.16.1.102:6642       173.16.1.101:52936      ESTABLISHED 1584913/ovsdb-serve
+tcp        0      0 173.16.1.102:6642       173.16.1.103:48560      ESTABLISHED 1584913/ovsdb-serve
 
 ```
 
@@ -77,12 +77,12 @@ tcp        0      0 172.16.1.102:6642       172.16.1.103:48560      ESTABLISHED 
 Chassis "fbf35122-d736-4293-a835-ce6c0bd07261"
     hostname: "matrix_01"
     Encap geneve
-        ip: "172.16.1.101"
+        ip: "173.16.1.101"
         options: {csum="true"}
 Chassis "f75f6ead-80b2-4225-a898-cd911d0a0f59"
     hostname: "matrix_03"
     Encap geneve
-        ip: "172.16.1.103"
+        ip: "173.16.1.103"
         options: {csum="true"}
 
 ```
@@ -97,8 +97,8 @@ Chassis "f75f6ead-80b2-4225-a898-cd911d0a0f59"
 
 两个子网
 
-- vpc1 172.66.1.0/24 vm1 vm3 
-- vpc2 172.77.1.0/24 vm2 vm4 
+- vpc1 173.66.1.0/24 vm1 vm3 
+- vpc2 173.77.1.0/24 vm2 vm4 
 
 四个虚拟机
 
@@ -121,8 +121,8 @@ ovn-nbctl ls-add vpc2
 路由这边
 
 ```bash
-#创建路由连接到vpc1端口，并分配mac 02:ac:10:ff:34:01 IP 172.66.1.10
-ovn-nbctl lrp-add user1 user1-vpc1 02:ac:10:ff:34:01 172.66.1.10/24
+#创建路由连接到vpc1端口，并分配mac 02:ac:10:ff:34:01 IP 173.66.1.10
+ovn-nbctl lrp-add user1 user1-vpc1 02:ac:10:ff:34:01 173.66.1.10/24
 ```
 交换机就这边
 
@@ -138,8 +138,8 @@ ovn-nbctl lsp-set-options vpc1-user1 router-port=user1-vpc1
 路由这边
 
 ```bash
-#创建路由连接到vpc2端口，并分配mac 02:ac:10:ff:34:02 IP 172.77.1.10
-ovn-nbctl lrp-add user1 user1-vpc2 02:ac:10:ff:34:02 172.77.1.10/24
+#创建路由连接到vpc2端口，并分配mac 02:ac:10:ff:34:02 IP 173.77.1.10
+ovn-nbctl lrp-add user1 user1-vpc2 02:ac:10:ff:34:02 173.77.1.10/24
 ```
 
 交换机这边
@@ -161,16 +161,16 @@ vm1
 
 ```bash
 ovn-nbctl lsp-add vpc1 vpc1-vm1
-ovn-nbctl lsp-set-addresses vpc1-vm1 "02:ac:10:ff:01:30 172.66.1.101"
-ovn-nbctl lsp-set-port-security vpc1-vm1 "02:ac:10:ff:01:30 172.66.1.101"
+ovn-nbctl lsp-set-addresses vpc1-vm1 "02:ac:10:ff:01:30 173.66.1.101"
+ovn-nbctl lsp-set-port-security vpc1-vm1 "02:ac:10:ff:01:30 173.66.1.101"
 ```
 
 vm3
 
 ```bash
 ovn-nbctl lsp-add vpc1 vpc1-vm3
-ovn-nbctl lsp-set-addresses vpc1-vm3 "02:ac:10:ff:01:33 172.66.1.103"
-ovn-nbctl lsp-set-port-security vpc1-vm3 "02:ac:10:ff:01:33 172.66.1.103"
+ovn-nbctl lsp-set-addresses vpc1-vm3 "02:ac:10:ff:01:33 173.66.1.103"
+ovn-nbctl lsp-set-port-security vpc1-vm3 "02:ac:10:ff:01:33 173.66.1.103"
 ```
 
 ### vpc2
@@ -179,16 +179,16 @@ vm2
 
 ```bash
 ovn-nbctl lsp-add vpc2 vpc2-vm2
-ovn-nbctl lsp-set-addresses vpc2-vm2 "02:ac:10:ff:01:22 172.77.1.102"
-ovn-nbctl lsp-set-port-security vpc2-vm2 "02:ac:10:ff:01:22 172.77.1.102"
+ovn-nbctl lsp-set-addresses vpc2-vm2 "02:ac:10:ff:01:22 173.77.1.102"
+ovn-nbctl lsp-set-port-security vpc2-vm2 "02:ac:10:ff:01:22 173.77.1.102"
 ```
 
 vm4
 
 ```bash
 ovn-nbctl lsp-add vpc2 vpc2-vm4
-ovn-nbctl lsp-set-addresses vpc2-vm4 "02:ac:10:ff:01:44 172.77.1.104"
-ovn-nbctl lsp-set-port-security vpc2-vm4 "02:ac:10:ff:01:44 172.77.1.104"
+ovn-nbctl lsp-set-addresses vpc2-vm4 "02:ac:10:ff:01:44 173.77.1.104"
+ovn-nbctl lsp-set-port-security vpc2-vm4 "02:ac:10:ff:01:44 173.77.1.104"
 ```
 
 ## 拓扑查看
@@ -201,14 +201,14 @@ switch 27c7499b-c42b-4422-9ca8-359b5d33e249 (vpc1)
         addresses: ["02:ac:10:ff:34:01"]
         router-port: user1-vpc1
     port vpc1-vm1
-        addresses: ["02:ac:10:ff:01:30 172.66.1.101"]
+        addresses: ["02:ac:10:ff:01:30 173.66.1.101"]
     port vpc1-vm3
-        addresses: ["02:ac:10:ff:01:33 172.66.1.103"]
+        addresses: ["02:ac:10:ff:01:33 173.66.1.103"]
 switch 1a402073-2ba3-4a1f-a6ee-65cf80d64a93 (vpc2)
     port vpc2-vm2
-        addresses: ["02:ac:10:ff:01:22 172.77.1.102"]
+        addresses: ["02:ac:10:ff:01:22 173.77.1.102"]
     port vpc2-vm4
-        addresses: ["02:ac:10:ff:01:44 172.77.1.104"]
+        addresses: ["02:ac:10:ff:01:44 173.77.1.104"]
     port vpc2-user1
         type: router
         addresses: ["02:ac:10:ff:34:02"]
@@ -216,10 +216,10 @@ switch 1a402073-2ba3-4a1f-a6ee-65cf80d64a93 (vpc2)
 router 502be54f-87bd-4e3a-bf88-390eaa29c531 (user1)
     port user1-vpc2
         mac: "02:ac:10:ff:34:02"
-        networks: ["172.77.1.10/24"]
+        networks: ["173.77.1.10/24"]
     port user1-vpc1
         mac: "02:ac:10:ff:34:01"
-        networks: ["172.66.1.10/24"]
+        networks: ["173.66.1.10/24"]
 ```
 
 ## 为vpc创建dhcp选项
@@ -231,9 +231,9 @@ server_id和router均为交换机在路由器上端口IP，server_mac为交换�
 创建选项
 
 ```bash
-ovn-nbctl create DHCP_Options cidr=172.66.1.0/24 \
-options="\"server_id\"=\"172.66.1.10\" \"server_mac\"=\"02:ac:10:ff:34:01\" \
-\"lease_time\"=\"3600\" \"router\"=\"172.66.1.10\""
+ovn-nbctl create DHCP_Options cidr=173.66.1.0/24 \
+options="\"server_id\"=\"173.66.1.10\" \"server_mac\"=\"02:ac:10:ff:34:01\" \
+\"lease_time\"=\"3600\" \"router\"=\"173.66.1.10\""
 
 #返回选项id
 e354c0ff-846e-4e7e-af23-28b5f9b569d6
@@ -253,8 +253,8 @@ ovn-nbctl lsp-get-dhcpv4-options vpc1-vm1
 ovn-nbctl lsp-get-dhcpv4-options vpc1-vm3
 
 #返回选项
-e354c0ff-846e-4e7e-af23-28b5f9b569d6 (172.66.1.0/24)
-e354c0ff-846e-4e7e-af23-28b5f9b569d6 (172.66.1.0/24)
+e354c0ff-846e-4e7e-af23-28b5f9b569d6 (173.66.1.0/24)
+e354c0ff-846e-4e7e-af23-28b5f9b569d6 (173.66.1.0/24)
 ```
 
 ### vpc2
@@ -262,9 +262,9 @@ e354c0ff-846e-4e7e-af23-28b5f9b569d6 (172.66.1.0/24)
 创建选项
 
 ```bash
-ovn-nbctl create DHCP_Options cidr=172.77.1.0/24 \
-options="\"server_id\"=\"172.77.1.10\" \"server_mac\"=\"02:ac:10:ff:34:02\" \
-\"lease_time\"=\"3600\" \"router\"=\"172.77.1.10\""
+ovn-nbctl create DHCP_Options cidr=173.77.1.0/24 \
+options="\"server_id\"=\"173.77.1.10\" \"server_mac\"=\"02:ac:10:ff:34:02\" \
+\"lease_time\"=\"3600\" \"router\"=\"173.77.1.10\""
 
 #返回选项id
 997e31dd-0d11-410c-9455-9c775085bed1
@@ -284,8 +284,8 @@ ovn-nbctl lsp-get-dhcpv4-options vpc2-vm2
 ovn-nbctl lsp-get-dhcpv4-options vpc2-vm4
 
 #返回选项
-997e31dd-0d11-410c-9455-9c775085bed1 (172.77.1.0/24)
-997e31dd-0d11-410c-9455-9c775085bed1 (172.77.1.0/24)
+997e31dd-0d11-410c-9455-9c775085bed1 (173.77.1.0/24)
+997e31dd-0d11-410c-9455-9c775085bed1 (173.77.1.0/24)
 ```
 
 ## 端口查看
@@ -294,14 +294,14 @@ ovn-nbctl lsp-get-dhcpv4-options vpc2-vm4
 Chassis "fbf35122-d736-4293-a835-ce6c0bd07261"
     hostname: "matrix_01"
     Encap geneve
-        ip: "172.16.1.101"
+        ip: "173.16.1.101"
         options: {csum="true"}
     Port_Binding "vpc1-vm1"
     Port_Binding "vpc2-vm2"
 Chassis "f75f6ead-80b2-4225-a898-cd911d0a0f59"
     hostname: "matrix_03"
     Encap geneve
-        ip: "172.16.1.103"
+        ip: "173.16.1.103"
         options: {csum="true"}
     Port_Binding "vpc1-vm3"
     Port_Binding "vpc2-vm4"
@@ -365,7 +365,7 @@ ip netns exec vm4 ip route show
 在103上执行
 
 ```bash
-ip netns exec vm3 ping 172.66.1.101
+ip netns exec vm3 ping 173.66.1.101
 ```
 
 在101上查看
@@ -373,7 +373,7 @@ ip netns exec vm3 ping 172.66.1.101
 ```bash
 [root@matrix_01 ~]# ip netns exec vm1 arp -n
 Address                  HWtype  HWaddress           Flags Mask            Iface
-172.66.1.103             ether   02:ac:10:ff:01:33   C                  
+173.66.1.103             ether   02:ac:10:ff:01:33   C                  
 ```
 
 ## 测试vpc2
@@ -381,7 +381,7 @@ Address                  HWtype  HWaddress           Flags Mask            Iface
 在103上执行
 
 ```bash
-ip netns exec vm4 ping 172.77.1.102
+ip netns exec vm4 ping 173.77.1.102
 ```
 
 在101上查看
@@ -389,7 +389,7 @@ ip netns exec vm4 ping 172.77.1.102
 ```bash
 [root@matrix_01 ~]# ip netns exec vm2 arp -n
 Address                  HWtype  HWaddress           Flags Mask            Iface
-172.77.1.104             ether   02:ac:10:ff:01:44   C        
+173.77.1.104             ether   02:ac:10:ff:01:44   C        
 ```
 
 ## 测试vpc1和vpc2之间
@@ -397,7 +397,7 @@ Address                  HWtype  HWaddress           Flags Mask            Iface
 在103上执行
 
 ```bash
-ip netns exec vm3 ping 172.77.1.102
+ip netns exec vm3 ping 173.77.1.102
 ```
 
 在101上查看
@@ -405,8 +405,8 @@ ip netns exec vm3 ping 172.77.1.102
 ```bash
 [root@matrix_01 ~]# ip netns exec vm2 arp -n
 Address                  HWtype  HWaddress           Flags Mask            Iface
-172.77.1.104             ether   02:ac:10:ff:01:44   C                     vm2
-172.77.1.10              ether   02:ac:10:ff:34:02   C                     vm2
+173.77.1.104             ether   02:ac:10:ff:01:44   C                     vm2
+173.77.1.10              ether   02:ac:10:ff:34:02   C                     vm2
 ```
 路由器内不同端口之间是可以路由的
 
@@ -417,19 +417,19 @@ Address                  HWtype  HWaddress           Flags Mask            Iface
 加入错误路由
 
 ```bash
-ovn-nbctl  lr-route-add user1 172.77.1.0/24 172.66.10
+ovn-nbctl  lr-route-add user1 173.77.1.0/24 173.66.10
 ```
 
 在103上测试，发现不通
 
 ```bash
-ip netns exec vm3 ping 172.77.1.102
+ip netns exec vm3 ping 173.77.1.102
 ```
 
 删除错误路由
 
 ```bash
-ovn-nbctl  lr-route-del user1 172.77.1.0/24
+ovn-nbctl  lr-route-del user1 173.77.1.0/24
 #查看路由
 ovn-nbctl lr-route-list user1
 ```
@@ -437,7 +437,7 @@ ovn-nbctl lr-route-list user1
 在103上测试，发现通
 
 ```bash
-ip netns exec vm3 ping 172.77.1.102
+ip netns exec vm3 ping 173.77.1.102
 ```
 
 ## 路由端口状态
@@ -455,25 +455,25 @@ ovn-nbctl lrp-get-enabled user1-vpc2
 测试vpc内，通
 
 ```bash
-[root@matrix_03 ~]# ip netns exec vm4 ping 172.77.1.102
-PING 172.77.1.102 (172.77.1.102) 56(84) bytes of data.
-64 bytes from 172.77.1.102: icmp_seq=1 ttl=64 time=1.42 ms
-64 bytes from 172.77.1.102: icmp_seq=2 ttl=64 time=0.314 ms
+[root@matrix_03 ~]# ip netns exec vm4 ping 173.77.1.102
+PING 173.77.1.102 (173.77.1.102) 56(84) bytes of data.
+64 bytes from 173.77.1.102: icmp_seq=1 ttl=64 time=1.42 ms
+64 bytes from 173.77.1.102: icmp_seq=2 ttl=64 time=0.314 ms
 
-[root@matrix_03 ~]# ip netns exec vm3 ping 172.66.1.101
-PING 172.66.1.101 (172.66.1.101) 56(84) bytes of data.
-64 bytes from 172.66.1.101: icmp_seq=1 ttl=64 time=1.39 ms
-64 bytes from 172.66.1.101: icmp_seq=2 ttl=64 time=0.262 ms
+[root@matrix_03 ~]# ip netns exec vm3 ping 173.66.1.101
+PING 173.66.1.101 (173.66.1.101) 56(84) bytes of data.
+64 bytes from 173.66.1.101: icmp_seq=1 ttl=64 time=1.39 ms
+64 bytes from 173.66.1.101: icmp_seq=2 ttl=64 time=0.262 ms
 
 ```
 
 测试vpc间，不通
 
 ```bash
-[root@matrix_03 ~]# ip netns exec vm3 ping 172.77.1.102
-PING 172.77.1.102 (172.77.1.102) 56(84) bytes of data.
+[root@matrix_03 ~]# ip netns exec vm3 ping 173.77.1.102
+PING 173.77.1.102 (173.77.1.102) 56(84) bytes of data.
 ^C
---- 172.77.1.102 ping statistics ---
+--- 173.77.1.102 ping statistics ---
 1 packets transmitted, 0 received, 100% packet loss, time 0ms
 
 ```
@@ -487,11 +487,11 @@ ovn-nbctl lrp-set-enabled user1-vpc2 enabled
 测试vpc间，通
 
 ```bash
-[root@matrix_03 ~]# ip netns exec vm3 ping 172.77.1.102
-PING 172.77.1.102 (172.77.1.102) 56(84) bytes of data.
-64 bytes from 172.77.1.102: icmp_seq=1 ttl=63 time=1.84 ms
+[root@matrix_03 ~]# ip netns exec vm3 ping 173.77.1.102
+PING 173.77.1.102 (173.77.1.102) 56(84) bytes of data.
+64 bytes from 173.77.1.102: icmp_seq=1 ttl=63 time=1.84 ms
 ^C
---- 172.77.1.102 ping statistics ---
+--- 173.77.1.102 ping statistics ---
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
 rtt min/avg/max/mdev = 1.844/1.844/1.844/0.000 ms
 
@@ -508,9 +508,9 @@ rtt min/avg/max/mdev = 1.844/1.844/1.844/0.000 ms
 ### 创建br-int
 
 ```bash
-ovs-vsctl set Open_vSwitch . external-ids:ovn-remote=tcp:172.16.1.102:6642
+ovs-vsctl set Open_vSwitch . external-ids:ovn-remote=tcp:173.16.1.102:6642
 ovs-vsctl set Open_vSwitch . external-ids:ovn-encap-type=geneve
-ovs-vsctl set Open_vSwitch . external-ids:ovn-encap-ip=172.16.1.102
+ovs-vsctl set Open_vSwitch . external-ids:ovn-encap-ip=173.16.1.102
 ovs-vsctl add-br br-int -- set Bridge br-int fail-mode=secure
 
 ```
@@ -519,12 +519,12 @@ ovs-vsctl add-br br-int -- set Bridge br-int fail-mode=secure
 
 ```bash
 [root@matrix_02 openvswitch]# netstat -anp | grep 664
-tcp        0      0 172.16.1.102:6641       0.0.0.0:*               LISTEN      1584905/ovsdb-serve
-tcp        0      0 172.16.1.102:6642       0.0.0.0:*               LISTEN      1584913/ovsdb-serve
-tcp        0      0 172.16.1.102:6642       172.16.1.102:53268      ESTABLISHED 1584913/ovsdb-serve
-tcp        0      0 172.16.1.102:53268      172.16.1.102:6642       ESTABLISHED 1595069/ovn-control
-tcp        0      0 172.16.1.102:6642       172.16.1.101:52936      ESTABLISHED 1584913/ovsdb-serve
-tcp        0      0 172.16.1.102:6642       172.16.1.103:48560      ESTABLISHED 1584913/ovsdb-serve
+tcp        0      0 173.16.1.102:6641       0.0.0.0:*               LISTEN      1584905/ovsdb-serve
+tcp        0      0 173.16.1.102:6642       0.0.0.0:*               LISTEN      1584913/ovsdb-serve
+tcp        0      0 173.16.1.102:6642       173.16.1.102:53268      ESTABLISHED 1584913/ovsdb-serve
+tcp        0      0 173.16.1.102:53268      173.16.1.102:6642       ESTABLISHED 1595069/ovn-control
+tcp        0      0 173.16.1.102:6642       173.16.1.101:52936      ESTABLISHED 1584913/ovsdb-serve
+tcp        0      0 173.16.1.102:6642       173.16.1.103:48560      ESTABLISHED 1584913/ovsdb-serve
 ```
 
 ### 获取102Chassis uuid
@@ -536,19 +536,19 @@ tcp        0      0 172.16.1.102:6642       172.16.1.103:48560      ESTABLISHED 
 Chassis "fbf35122-d736-4293-a835-ce6c0bd07261"
     hostname: "matrix_01"
     Encap geneve
-        ip: "172.16.1.101"
+        ip: "173.16.1.101"
         options: {csum="true"}
     Port_Binding "vpc1-vm1"
     Port_Binding "vpc2-vm2"
 Chassis "1859fa77-e381-405c-b08b-ef7029658426"
     hostname: "matrix_02"
     Encap geneve
-        ip: "172.16.1.102"
+        ip: "173.16.1.102"
         options: {csum="true"}
 Chassis "f75f6ead-80b2-4225-a898-cd911d0a0f59"
     hostname: "matrix_03"
     Encap geneve
-        ip: "172.16.1.103"
+        ip: "173.16.1.103"
         options: {csum="true"}
     Port_Binding "vpc1-vm3"
     Port_Binding "vpc2-vm4"
@@ -569,7 +569,7 @@ ovn-nbctl create Logical_Router name=gateway_route options:chassis=1859fa77-e381
 ovn-nbctl ls-add transit
 
 #gateway_route路由增加transit端口
-ovn-nbctl lrp-add gateway_route gateway_transit 02:ac:10:ff:00:01 172.88.1.10/24
+ovn-nbctl lrp-add gateway_route gateway_transit 02:ac:10:ff:00:01 173.88.1.10/24
 
 #transit交换机连接路由gateway_route
 ovn-nbctl lsp-add transit transit-gateway
@@ -579,7 +579,7 @@ ovn-nbctl lsp-set-options transit-gateway router-port=gateway_transit
 
 
 #user1和transit连接
-ovn-nbctl lrp-add user1 user1-transit 02:ac:10:ff:00:02 172.88.1.20/24
+ovn-nbctl lrp-add user1 user1-transit 02:ac:10:ff:00:02 173.88.1.20/24
 
 ovn-nbctl lsp-add transit transit-user1
 ovn-nbctl lsp-set-type transit-user1 router
@@ -589,16 +589,16 @@ ovn-nbctl lsp-set-options transit-user1 router-port=user1-transit
 
 ### 静态路由添加
 
-需要vm1-4到gateway_route上端口172.88.1.10通。注意添加去包路由和回包路由，transit可认为是线缆。
+需要vm1-4到gateway_route上端口173.88.1.10通。注意添加去包路由和回包路由，transit可认为是线缆。
 
 主要是在路由器gateway_route和user1之间添加互通路由
 
 #### 对user1
 
-需要添加默认网关到172.88.1.10，不是20，20本来就通，其实是本地接口
+需要添加默认网关到173.88.1.10，不是20，20本来就通，其实是本地接口
 
 ```bash
-ovn-nbctl lr-route-add user1 "0.0.0.0/0" 172.88.1.10
+ovn-nbctl lr-route-add user1 "0.0.0.0/0" 173.88.1.10
 ```
 
 #### 对gateway_route
@@ -606,32 +606,32 @@ ovn-nbctl lr-route-add user1 "0.0.0.0/0" 172.88.1.10
 重点添加回包路由，对于到两个子网的包都从user1上的口出
 
 ```bash
-ovn-nbctl lr-route-add gateway_route "172.77.1.0/24" 172.88.1.20
-ovn-nbctl lr-route-add gateway_route "172.66.1.0/24" 172.88.1.20
+ovn-nbctl lr-route-add gateway_route "173.77.1.0/24" 173.88.1.20
+ovn-nbctl lr-route-add gateway_route "173.66.1.0/24" 173.88.1.20
 ```
 
 ### 测试
 
-两个vpc到172.88.1.10
+两个vpc到173.88.1.10
 
 ```bash
 #vpc1
-[root@matrix_03 ~]# ip netns exec vm4 ping 172.88.1.10
-PING 172.88.1.10 (172.88.1.10) 56(84) bytes of data.
-64 bytes from 172.88.1.10: icmp_seq=1 ttl=253 time=1.46 ms
-64 bytes from 172.88.1.10: icmp_seq=2 ttl=253 time=0.607 ms
+[root@matrix_03 ~]# ip netns exec vm4 ping 173.88.1.10
+PING 173.88.1.10 (173.88.1.10) 56(84) bytes of data.
+64 bytes from 173.88.1.10: icmp_seq=1 ttl=253 time=1.46 ms
+64 bytes from 173.88.1.10: icmp_seq=2 ttl=253 time=0.607 ms
 ^C
---- 172.88.1.10 ping statistics ---
+--- 173.88.1.10 ping statistics ---
 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
 rtt min/avg/max/mdev = 0.607/1.036/1.466/0.430 ms
 
 #vpc2
-[root@matrix_03 ~]# ip netns exec vm3 ping 172.88.1.10
-PING 172.88.1.10 (172.88.1.10) 56(84) bytes of data.
-64 bytes from 172.88.1.10: icmp_seq=1 ttl=253 time=1.73 ms
-64 bytes from 172.88.1.10: icmp_seq=2 ttl=253 time=0.635 ms
+[root@matrix_03 ~]# ip netns exec vm3 ping 173.88.1.10
+PING 173.88.1.10 (173.88.1.10) 56(84) bytes of data.
+64 bytes from 173.88.1.10: icmp_seq=1 ttl=253 time=1.73 ms
+64 bytes from 173.88.1.10: icmp_seq=2 ttl=253 time=0.635 ms
 ^C
---- 172.88.1.10 ping statistics ---
+--- 173.88.1.10 ping statistics ---
 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
 rtt min/avg/max/mdev = 0.635/1.185/1.735/0.550 ms
 
@@ -710,13 +710,13 @@ rtt min/avg/max/mdev = 0.309/0.431/0.645/0.152 ms
 
 ```bash
 #对vpc1
-ovn-nbctl -- --id=@nat create nat type="snat" logical_ip=172.66.1.0/24 \
+ovn-nbctl -- --id=@nat create nat type="snat" logical_ip=173.66.1.0/24 \
 external_ip=192.168.66.45 -- add logical_router gateway_route nat @nat
 #会返回uuid
 56ad6c5b-8417-4314-95c4-a0d780b5ef0b
 
 #对vpc2
-ovn-nbctl -- --id=@nat create nat type="snat" logical_ip=172.77.1.0/24 \
+ovn-nbctl -- --id=@nat create nat type="snat" logical_ip=173.77.1.0/24 \
 external_ip=192.168.66.45 -- add logical_router gateway_route nat @nat
 #会返回uuid
 ca82de02-f527-480a-9af7-5261517bab37
@@ -725,8 +725,8 @@ ca82de02-f527-480a-9af7-5261517bab37
 也可以对vm绑定外网地址
 
 ```bash
-#对vm3 172.66.1.103  绑定外网 192.168.66.46 
-ovn-nbctl -- --id=@nat create nat type="dnat_and_snat" logical_ip=172.66.1.103 \
+#对vm3 173.66.1.103  绑定外网 192.168.66.46 
+ovn-nbctl -- --id=@nat create nat type="dnat_and_snat" logical_ip=173.66.1.103 \
 external_ip=192.168.66.46 -- add logical_router gateway_route nat @nat
 ```
 
@@ -785,9 +785,9 @@ switch a1395d52-e659-47f7-a217-042004a2e324 (transit)
         router-port: gateway_transit
 switch 1a402073-2ba3-4a1f-a6ee-65cf80d64a93 (vpc2)
     port vpc2-vm2
-        addresses: ["02:ac:10:ff:01:22 172.77.1.102"]
+        addresses: ["02:ac:10:ff:01:22 173.77.1.102"]
     port vpc2-vm4
-        addresses: ["02:ac:10:ff:01:44 172.77.1.104"]
+        addresses: ["02:ac:10:ff:01:44 173.77.1.104"]
     port vpc2-user1
         type: router
         addresses: ["02:ac:10:ff:34:02"]
@@ -806,34 +806,34 @@ switch 27c7499b-c42b-4422-9ca8-359b5d33e249 (vpc1)
         addresses: ["02:ac:10:ff:34:01"]
         router-port: user1-vpc1
     port vpc1-vm1
-        addresses: ["02:ac:10:ff:01:30 172.66.1.101"]
+        addresses: ["02:ac:10:ff:01:30 173.66.1.101"]
     port vpc1-vm3
-        addresses: ["02:ac:10:ff:01:33 172.66.1.103"]
+        addresses: ["02:ac:10:ff:01:33 173.66.1.103"]
 router 5d07c35c-f2d4-4339-b618-83ad2a09f704 (gateway_route)
     port gateway_out
         mac: "02:0a:7f:00:01:88"
         networks: ["192.168.66.45/23"]
     port gateway_transit
         mac: "02:ac:10:ff:00:01"
-        networks: ["172.88.1.10/24"]
+        networks: ["173.88.1.10/24"]
     nat 56ad6c5b-8417-4314-95c4-a0d780b5ef0b
         external ip: "192.168.66.45"
-        logical ip: "172.66.1.0/24"
+        logical ip: "173.66.1.0/24"
         type: "snat"
     nat ca82de02-f527-480a-9af7-5261517bab37
         external ip: "192.168.66.45"
-        logical ip: "172.77.1.0/24"
+        logical ip: "173.77.1.0/24"
         type: "snat"
 router 502be54f-87bd-4e3a-bf88-390eaa29c531 (user1)
     port user1-vpc2
         mac: "02:ac:10:ff:34:02"
-        networks: ["172.77.1.10/24"]
+        networks: ["173.77.1.10/24"]
     port user1-transit
         mac: "02:ac:10:ff:00:02"
-        networks: ["172.88.1.20/24"]
+        networks: ["173.88.1.20/24"]
     port user1-vpc1
         mac: "02:ac:10:ff:34:01"
-        networks: ["172.66.1.10/24"]
+        networks: ["173.66.1.10/24"]
 
 ```
 
@@ -875,7 +875,7 @@ ncat -l -u 1234
 
 ```bash
 #创建一个地址集合
-ovn-nbctl create Address_Set name=app addresses=\"172.16.255.130/31\"
+ovn-nbctl create Address_Set name=app addresses=\"173.16.255.130/31\"
 
 #优先通过web通过
 ovn-nbctl acl-add vpc1 to-lport 1000 'outport == "vpc1-vm3" && tcp.dst == 80' allow-related

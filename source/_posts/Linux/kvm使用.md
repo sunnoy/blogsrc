@@ -49,7 +49,7 @@ ip link set dev eth2 master br-wan
 ip route del default via 192.168.12.1 dev eth2
 ip route add default via 192.168.12.1 dev br-wan
 
-ping 172.18.10.1 -c 3 > /dev/null
+ping 173.18.22.1 -c 3 > /dev/null
 
 if $? -ne 0; then
 

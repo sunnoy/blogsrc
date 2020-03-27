@@ -9,7 +9,7 @@ tags:
 
 harbor是一个私有镜像源
 
-![屏幕快照 2019-03-19 10.31.01](https://qiniu.li-rui.top/屏幕快照%202019-03-19%2010.31.01.png)
+![屏幕快照 2019-03-19 22.31.01](https://qiniu.li-rui.top/屏幕快照%202019-03-19%2022.31.01.png)
 
 <!--more-->
 
@@ -83,7 +83,7 @@ git clone -b 1.0.0 https://github.com/goharbor/harbor-helm.git
 nfs服务端
 ```bash
 cat /etc/exports
-/data/harbor-data    10.9.1.0/24(rw,sync,no_root_squash,no_all_squash)
+/data/harbor-data    22.9.1.0/24(rw,sync,no_root_squash,no_all_squash)
 
 #为每个pv简历文件夹
 for i in {1..5}; do
@@ -114,7 +114,7 @@ spec:
   persistentVolumeReclaimPolicy: Recycle
   nfs:
     path: /data/harbor-data/nfs${i}
-    server: 10.9.1.146
+    server: 22.9.1.146
 EOF
 done
 ```

@@ -267,7 +267,7 @@ method_code:http_errors:rate5m{code="500"} / ignoring(code) method:http_requests
 ceph_osd_metadata包含标签为下。值为`1`
 
 ```bash
-{ceph_daemon="osd.0",ceph_version="ceph version 12.2.8 (ae699615bac534ea496ee965ac6192cb7e0e07c0) luminous (stable)",cluster="machine_room",cluster_addr="172.20.1.103",device_class="hdd",hostname="matrix_03",instance="192.168.66.112:9283",job="ceph",public_addr="172.20.1.103"}
+{ceph_daemon="osd.0",ceph_version="ceph version 12.2.8 (ae699615bac534ea496ee965ac6192cb7e0e07c0) luminous (stable)",cluster="machine_room",cluster_addr="173.20.1.103",device_class="hdd",hostname="matrix_03",instance="192.168.66.112:9283",job="ceph",public_addr="173.20.1.103"}
 ```
 
 ceph_osd_in包含标签为

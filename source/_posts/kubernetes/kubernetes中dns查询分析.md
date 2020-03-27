@@ -59,7 +59,7 @@ Run a program with namespaces of other processes.
 #选择容器
 kubectl get pod -n kube-system coredns-66798c86bd-zrvz6 -o wide
 NAME                       READY   STATUS    RESTARTS   AGE   IP             NODE         NOMINATED NODE   READINESS GATES
-coredns-66798c86bd-zrvz6   1/1     Running   0          21h   172.77.2.118   10.9.1.174   <none>           <none>
+coredns-66798c86bd-zrvz6   1/1     Running   0          21h   173.77.2.118   22.9.1.174   <none>           <none>
 
 #获取详情
 kubectl describe pod -n kube-system coredns-66798c86bd-zrvz6
@@ -96,7 +96,7 @@ ip a
     link/ipip 0.0.0.0 brd 0.0.0.0
 4: eth0@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP
     link/ether 62:34:e5:54:f2:21 brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 172.77.2.118/24 scope global eth0
+    inet 173.77.2.118/24 scope global eth0
        valid_lft forever preferred_lft forever
 ```
 
@@ -108,7 +108,7 @@ ip a
 
 ```bash
 cat /etc/resolv.conf
-nameserver 10.68.0.2
+nameserver 22.68.0.2
 search default.svc.cluster.local. svc.cluster.local. cluster.local.
 options ndots:5
 ```
@@ -117,7 +117,7 @@ options ndots:5
 
 ```bash
 cat /etc/resolv.conf
-nameserver 10.68.0.2
+nameserver 22.68.0.2
 search sre.svc.cluster.local. svc.cluster.local. cluster.local.
 options ndots:5
 ```
@@ -146,7 +146,7 @@ nslookup www.li-rui.top
 
 容器内执行的查询流程为
 
-- 找到dns服务器 10.68.0.2
+- 找到dns服务器 22.68.0.2
 - 依次将域名 www.li-rui.top 带入到 search 后面的多个域，向dns服务器进行查询，没有就继续查询
     - www.li-rui.top.default.svc.cluster.local 先查询A 然后是AAAA
     - www.li-rui.top.svc.cluster.local
@@ -165,8 +165,8 @@ nslookup www.li-rui.top
 ## 抓包
 
 ```bash
-#172.77.2.120为发送dns查询请求的容器IP
-tcpdump -vvv -n -i eth0 udp dst port 53 and host 172.77.2.120 -w dns
+#173.77.2.120为发送dns查询请求的容器IP
+tcpdump -vvv -n -i eth0 udp dst port 53 and host 173.77.2.120 -w dns
 ```
 
 ![dns查询](https://qiniu.li-rui.top/dns查询.png)
@@ -176,7 +176,7 @@ tcpdump -vvv -n -i eth0 udp dst port 53 and host 172.77.2.120 -w dns
 nginx跑在k8s中以后配置upstream的时候需要补全search后的部分
 
 ```bash
-resolver 10.68.0.2;
+resolver 22.68.0.2;
 location / {
   set $myupstream xxx.xxx.svc.cluster.local.;
   proxy_pass http://${myupstream}:444;

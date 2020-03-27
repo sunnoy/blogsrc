@@ -38,11 +38,11 @@ kubectl describe deployment http
 
 - 创建一个服务并暴露端口
 ```bash
-kubectl expose deployment http --external-ip="172.17.0.30" --port=8000 --target-port=80
+kubectl expose deployment http --external-ip="173.17.0.30" --port=8000 --target-port=80
 ```
 - 访问这个服务
 ```bash
-curl http://172.17.0.30:8000
+curl http://173.17.0.30:8000
 ```
 ### 4 执行deployment创建服务二合一
 
@@ -54,7 +54,7 @@ kubectl run httpexposed --image=katacoda/docker-http-server:latest --replicas=1 
 - 访问二合一命令下的服务
 
 ```bash
-curl http://172.17.0.30:8001
+curl http://173.17.0.30:8001
 ```
 - 服务状态
 该命令使用了docker的端口映射
