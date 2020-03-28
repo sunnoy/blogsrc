@@ -138,7 +138,7 @@ exturl: false
 # Value after `||` delimeter is the name of FontAwesome icon. If icon (with or without delimeter) is not specified, question icon will be loaded.
 menu:
   home: / || home
-  photography: /photos/  || camera
+  # photography: /photos/  || camera
   about: /about/ || user
   tags: /tags/ || tags
   #categories: /categories/ || th
