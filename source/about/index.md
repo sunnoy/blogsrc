@@ -28,6 +28,15 @@ comments: false
 <tzhsz.123@gmail.com>
 
 
+# 关于博客更新
+
+不知道从哪个开始，慢慢消退了博客更新的冲动
+
+so，从 2020.05.17 开始博客更新开始无限期停摆
+
+期待下一次的见面！
+
+
 # avenue of poplars in autumn
 
 最后附上副画 
